@@ -1,6 +1,6 @@
 # Test files
-/*.html
-/*.css
+*.html
+*.css
 
 # Binaries
 /mdhtml
