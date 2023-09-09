@@ -29,7 +29,7 @@ func transformMarkdownToHTML(args Args) bool {
 		html = append(html, fmt.Sprintf("<style>%s</style>", style)...)
 	}
 
-	err = os.WriteFile(args.dest, html, 0644)
+	err = os.WriteFile(args.out, html, 0644)
 
 	if err != nil {
 		log.Fatalf("Error writing to file: %s", err)

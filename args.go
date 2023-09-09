@@ -7,20 +7,20 @@ import (
 
 type Args struct {
 	file  string
-	dest  string
+	out   string
 	style string
 }
 
 func parseArgs() Args {
 	// create and parse flags using the flag package
 	file := flag.String("file", "", "The markdown file to convert to HTML")
-	dest := flag.String("dest", "", "The destination file to write the HTML to")
+	out := flag.String("out", "", "The destination file to write the HTML to")
 	style := flag.String("style", "", "Apply extra styling to the HTML using a CSS file")
 	// test := flag.String("test", "", "The destination file to write the HTML to")
 
 	flag.Parse()
 
-	if *file == "" || *dest == "" {
+	if *file == "" || *out == "" {
 		flag.Usage()
 		os.Exit(1)
 	}
@@ -28,7 +28,7 @@ func parseArgs() Args {
 	// return instance of Args
 	return Args{
 		file:  *file,
-		dest:  *dest,
+		out:   *out,
 		style: *style,
 	}
 }

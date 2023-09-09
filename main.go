@@ -30,7 +30,7 @@ func main() {
 
 	fmt.Println()
 
-	destPath := getAbsolutePath(args.dest)
+	destPath := getAbsolutePath(args.out)
 	fmt.Printf("== Successfully wrote to %s!\n", destPath)
 
 	fmt.Printf("View in browser at: file://%s\n", destPath)
