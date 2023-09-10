@@ -19,7 +19,6 @@ func transformMarkdownToHTML(args Args) bool {
 
 	// apply styling if provided
 	if args.style != "" {
-		fmt.Printf("config: applying the provided %s styling file..\n", args.style)
 		style, err := os.ReadFile(args.style)
 		if err != nil {
 			log.Fatalf("Error reading style file: %s", err)
