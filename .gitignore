@@ -4,3 +4,7 @@
 
 # Binaries
 /mdhtml
+
+# Build scripts and build files
+/build
+/build.sh
