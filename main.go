@@ -44,17 +44,18 @@ func transform(args Args, debug bool) {
 		stylePath = getAbsolutePath(args.style)
 	}
 
-	fmt.Printf("== Successfully wrote to %s!\n", destPath)
-	fmt.Printf("   Source file: %s\n", filePath)
+	if debug {
+		fmt.Printf("== Successfully wrote to %s!\n", destPath)
+		fmt.Printf("   Source file: %s\n", filePath)
 
-	if stylePath != "" {
-		fmt.Printf("   Style file: %s\n", stylePath)
+		if stylePath != "" {
+			fmt.Printf("   Style file: %s\n", stylePath)
+		}
+
+		fmt.Println()
+
+		fmt.Printf("View in browser at: file://%s\n", destPath)
 	}
-
-	fmt.Println()
-
-	fmt.Printf("View in browser at: file://%s\n", destPath)
-
 }
 
 func main() {
