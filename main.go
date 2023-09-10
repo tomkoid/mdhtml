@@ -20,12 +20,7 @@ func getAbsolutePath(path string) string {
 	return absPath
 }
 
-func main() {
-	// parse arguments
-	args := parseArgs()
-
-	checkFilesExist(args)
-
+func transform(args Args, debug bool) {
 	s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 
 	s.Suffix = fmt.Sprintf(" Transforming %s to HTML...", args.file)
@@ -59,4 +54,14 @@ func main() {
 	fmt.Println()
 
 	fmt.Printf("View in browser at: file://%s\n", destPath)
+
+}
+
+func main() {
+	// parse arguments
+	args := parseArgs()
+
+	checkFilesExist(args)
+
+	transform(args, true)
 }
