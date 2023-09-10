@@ -21,6 +21,8 @@ func main() {
 	// parse arguments
 	args := parseArgs()
 
+	checkFilesExist(args)
+
 	fmt.Println("Transforming markdown file to HTML...")
 	err := transformMarkdownToHTML(args)
 	if !err {
