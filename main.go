@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/briandowns/spinner"
+	"github.com/fatih/color"
 )
 
 func getAbsolutePath(path string) string {
@@ -25,7 +26,7 @@ func getAbsolutePath(path string) string {
 func transform(args Args, debug bool) {
 	s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 
-	s.Suffix = fmt.Sprintf(" Transforming %s to HTML...", args.file)
+	s.Suffix = fmt.Sprintf(" Transforming %s to HTML...", color.BlueString(args.file))
 	s.Start()
 
 	err := transformMarkdownToHTML(args)
@@ -47,7 +48,11 @@ func transform(args Args, debug bool) {
 	}
 
 	if debug {
-		fmt.Printf("== Successfully wrote to %s!\n", destPath)
+		color.Set(color.FgGreen)
+		fmt.Printf("==")
+		color.Unset()
+
+		fmt.Printf(" Successfully wrote to %s!\n", destPath)
 		fmt.Printf("   Source file: %s\n", filePath)
 
 		if stylePath != "" {
@@ -56,7 +61,11 @@ func transform(args Args, debug bool) {
 
 		fmt.Println()
 
-		fmt.Printf("View in browser at: file://%s\n", destPath)
+		color.Set(color.FgBlue, color.Bold)
+		fmt.Printf("View in browser at: ")
+		color.Unset()
+
+		fmt.Printf("file://%s\n", destPath)
 	}
 }
 
