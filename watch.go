@@ -6,7 +6,8 @@ import (
 	"io"
 	"log"
 	"os"
-	"time"
+
+	"github.com/fsnotify/fsnotify"
 )
 
 func GenerateSourceFileChecksum(args Args) string {
@@ -30,25 +31,63 @@ func GenerateSourceFileChecksum(args Args) string {
 }
 
 func transformWatch(args Args, debug bool) {
-	// get the initial hash
-	oldHash := GenerateSourceFileChecksum(args)
+	// use fsnotify to watch for changes
+	watcher, err := fsnotify.NewWatcher()
 
-	for {
-		// get the new hash
-		newHash := GenerateSourceFileChecksum(args)
-
-		// compare the hashes
-		if oldHash != newHash {
-			fmt.Println("== Detected change in file, transforming...")
-
-			// if they're different, transform the file
-			transform(args, false)
-
-			// update the old hash
-			oldHash = newHash
-		}
-
-		// sleep for 500ms
-		time.Sleep(500 * time.Millisecond)
+	if err != nil {
+		log.Fatalf("Error creating watcher: %s", err)
+		os.Exit(1)
 	}
+
+	defer watcher.Close()
+
+	sourceIsDir, _ := isDirectory(args.file)
+
+	if sourceIsDir {
+		log.Fatalf("Error: %s is a directory", args.file)
+		os.Exit(1)
+	}
+
+	done := make(chan bool)
+
+	go func() {
+		oldHash := GenerateSourceFileChecksum(args)
+
+		for {
+			select {
+			case event, ok := <-watcher.Events:
+				if !ok {
+					continue
+				}
+
+				if event.Op&fsnotify.Remove != fsnotify.Remove && event.Op&fsnotify.Write != fsnotify.Write && event.Op&fsnotify.Rename != fsnotify.Rename {
+					newHash := GenerateSourceFileChecksum(args)
+
+					if oldHash != newHash {
+						transform(args, false)
+
+						fmt.Println("== Successfully transformed to markdown...")
+
+						oldHash = newHash
+					}
+				}
+
+				watcher.Add(event.Name)
+			case err, ok := <-watcher.Errors:
+				if !ok {
+					continue
+				}
+
+				log.Println("error:", err)
+			}
+		}
+	}()
+
+	err = watcher.Add(args.file)
+	if err != nil {
+		log.Fatalf("Error adding file to watcher: %s", err)
+		os.Exit(1)
+	}
+
+	<-done
 }
