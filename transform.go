@@ -74,7 +74,7 @@ func transformMarkdownToHTML(args Args) bool {
 			os.Exit(1)
 		}
 
-		html = append(html, fmt.Sprintf("<style>%s</style>", style)...)
+		html = append(html, fmt.Sprintf("<style>\n%s\n</style>", style)...)
 	}
 
 	err = os.WriteFile(args.out, html, 0644)

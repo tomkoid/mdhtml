@@ -60,16 +60,14 @@ func transformWatch(args Args, debug bool) {
 					continue
 				}
 
-				if event.Op&fsnotify.Remove != fsnotify.Remove && event.Op&fsnotify.Write != fsnotify.Write && event.Op&fsnotify.Rename != fsnotify.Rename {
-					newHash := GenerateSourceFileChecksum(args)
+				newHash := GenerateSourceFileChecksum(args)
 
-					if oldHash != newHash {
-						transform(args, false)
+				if oldHash != newHash {
+					transform(args, false)
 
-						fmt.Println("== Successfully transformed to markdown...")
+					fmt.Println("== Successfully transformed to markdown...")
 
-						oldHash = newHash
-					}
+					oldHash = newHash
 				}
 
 				watcher.Add(event.Name)
