@@ -1,21 +1,15 @@
-package main
+package utils
 
 import (
 	"fmt"
 	"os"
 	"strings"
 
+	"codeberg.org/Tomkoid/mdhtml/internal/models"
 	flag "github.com/spf13/pflag"
 )
 
-type Args struct {
-	file  string
-	out   string
-	style string
-	watch bool
-}
-
-func parseArgs() Args {
+func ParseArgs() models.Args {
 	// create and parse flags using the flag package
 	file := flag.StringP("file", "f", "", "The markdown file to convert to HTML")
 	out := flag.StringP("out", "o", "", "The destination file to write the HTML to")
@@ -35,10 +29,10 @@ func parseArgs() Args {
 	}
 
 	// return instance of Args
-	return Args{
-		file:  *file,
-		out:   *out,
-		style: *style,
-		watch: *watch,
+	return models.Args{
+		File:  *file,
+		Out:   *out,
+		Style: *style,
+		Watch: *watch,
 	}
 }

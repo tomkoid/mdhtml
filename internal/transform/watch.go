@@ -1,4 +1,4 @@
-package main
+package transform
 
 import (
 	"crypto/md5"
@@ -7,11 +7,13 @@ import (
 	"log"
 	"os"
 
+	"codeberg.org/Tomkoid/mdhtml/internal/models"
+	"codeberg.org/Tomkoid/mdhtml/internal/utils"
 	"github.com/fsnotify/fsnotify"
 )
 
-func GenerateSourceFileChecksum(args Args) string {
-	file, err := os.Open(args.file)
+func GenerateSourceFileChecksum(args models.Args) string {
+	file, err := os.Open(args.File)
 	if err != nil {
 		log.Fatalf("Error opening file: %s", err)
 		os.Exit(1)
@@ -30,7 +32,7 @@ func GenerateSourceFileChecksum(args Args) string {
 	return string(hash.Sum(nil))
 }
 
-func transformWatch(args Args, debug bool) {
+func TransformWatch(args models.Args, debug bool) {
 	// use fsnotify to watch for changes
 	watcher, err := fsnotify.NewWatcher()
 
@@ -41,10 +43,10 @@ func transformWatch(args Args, debug bool) {
 
 	defer watcher.Close()
 
-	sourceIsDir, _ := isDirectory(args.file)
+	sourceIsDir, _ := utils.IsDirectory(args.File)
 
 	if sourceIsDir {
-		log.Fatalf("Error: %s is a directory", args.file)
+		log.Fatalf("Error: %s is a directory", args.File)
 		os.Exit(1)
 	}
 
@@ -63,7 +65,7 @@ func transformWatch(args Args, debug bool) {
 				newHash := GenerateSourceFileChecksum(args)
 
 				if oldHash != newHash {
-					transform(args, false)
+					Transform(args, false)
 
 					fmt.Println("== Successfully transformed to markdown...")
 
@@ -81,7 +83,7 @@ func transformWatch(args Args, debug bool) {
 		}
 	}()
 
-	err = watcher.Add(args.file)
+	err = watcher.Add(args.File)
 	if err != nil {
 		log.Fatalf("Error adding file to watcher: %s", err)
 		os.Exit(1)

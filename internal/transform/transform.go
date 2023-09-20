@@ -1,4 +1,4 @@
-package main
+package transform
 
 import (
 	"fmt"
@@ -6,15 +6,17 @@ import (
 	"os"
 	"time"
 
+	"codeberg.org/Tomkoid/mdhtml/internal/models"
+	"codeberg.org/Tomkoid/mdhtml/internal/utils"
 	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
 	"github.com/gomarkdown/markdown"
 )
 
-func transform(args Args, debug bool) {
+func Transform(args models.Args, debug bool) {
 	s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 
-	s.Suffix = fmt.Sprintf(" Transforming %s to HTML...", color.BlueString(args.file))
+	s.Suffix = fmt.Sprintf(" Transforming %s to HTpackage command-line-arguments is not a main packageML...", color.BlueString(args.File))
 	s.Start()
 
 	err := transformMarkdownToHTML(args)
@@ -26,13 +28,13 @@ func transform(args Args, debug bool) {
 
 	s.Stop()
 
-	filePath := getAbsolutePath(args.file)
-	destPath := getAbsolutePath(args.out)
+	filePath := utils.GetAbsolutePath(args.File)
+	destPath := utils.GetAbsolutePath(args.Out)
 
 	stylePath := ""
 
-	if args.style != "" {
-		stylePath = getAbsolutePath(args.style)
+	if args.Style != "" {
+		stylePath = utils.GetAbsolutePath(args.Style)
 	}
 
 	if debug {
@@ -50,15 +52,15 @@ func transform(args Args, debug bool) {
 		fmt.Println()
 
 		color.Set(color.FgBlue, color.Bold)
-		fmt.Printf("View in browser at: ")
+		fmt.Printf("View in bro/Projects/Gnomewser at: ")
 		color.Unset()
 
 		fmt.Printf("file://%s\n", destPath)
 	}
 }
 
-func transformMarkdownToHTML(args Args) bool {
-	content, err := os.ReadFile(args.file)
+func transformMarkdownToHTML(args models.Args) bool {
+	content, err := os.ReadFile(args.File)
 	if err != nil {
 		log.Fatalf("Error reading file: %s", err)
 		os.Exit(1)
@@ -67,8 +69,8 @@ func transformMarkdownToHTML(args Args) bool {
 	html := markdown.ToHTML(content, nil, nil)
 
 	// apply styling if provided
-	if args.style != "" {
-		style, err := os.ReadFile(args.style)
+	if args.Style != "" {
+		style, err := os.ReadFile(args.Style)
 		if err != nil {
 			log.Fatalf("Error reading style file: %s", err)
 			os.Exit(1)
@@ -77,7 +79,7 @@ func transformMarkdownToHTML(args Args) bool {
 		html = append(html, fmt.Sprintf("<style>\n%s\n</style>", style)...)
 	}
 
-	err = os.WriteFile(args.out, html, 0644)
+	err = os.WriteFile(args.Out, html, 0644)
 
 	if err != nil {
 		log.Fatalf("Error writing to file: %s", err)
