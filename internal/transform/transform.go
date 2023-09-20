@@ -16,7 +16,7 @@ import (
 func Transform(args models.Args, debug bool) {
 	s := spinner.New(spinner.CharSets[11], 100*time.Millisecond)
 
-	s.Suffix = fmt.Sprintf(" Transforming %s to HTpackage command-line-arguments is not a main packageML...", color.BlueString(args.File))
+	s.Suffix = fmt.Sprintf(" Transforming %s to HTML...", color.BlueString(args.File))
 	s.Start()
 
 	err := transformMarkdownToHTML(args)
