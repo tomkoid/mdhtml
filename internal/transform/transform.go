@@ -52,7 +52,7 @@ func Transform(args models.Args, debug bool) {
 		fmt.Println()
 
 		color.Set(color.FgBlue, color.Bold)
-		fmt.Printf("View in bro/Projects/Gnomewser at: ")
+		fmt.Printf("View in browser at: ")
 		color.Unset()
 
 		fmt.Printf("file://%s\n", destPath)
