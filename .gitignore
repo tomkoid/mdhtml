@@ -4,7 +4,12 @@
 
 # Binaries
 /mdhtml
+/main
 
 # Build scripts and build files
+/tmp
 /build
 /build.sh
+
+# other configuration files
+.air.toml

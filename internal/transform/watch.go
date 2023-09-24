@@ -7,16 +7,17 @@ import (
 	"log"
 	"os"
 
+	"codeberg.org/Tomkoid/mdhtml/internal/httpserver"
 	"codeberg.org/Tomkoid/mdhtml/internal/models"
 	"codeberg.org/Tomkoid/mdhtml/internal/utils"
 	"github.com/fsnotify/fsnotify"
 )
 
-func GenerateSourceFileChecksum(args models.Args) string {
+func GenerateSourceFileChecksum(args models.Args, oldHash string) string {
 	file, err := os.Open(args.File)
 	if err != nil {
-		log.Fatalf("Error opening file: %s", err)
-		os.Exit(1)
+		log.Printf("Error opening file: %s", err)
+		return oldHash
 	}
 
 	defer file.Close()
@@ -26,13 +27,13 @@ func GenerateSourceFileChecksum(args models.Args) string {
 
 	if err != nil {
 		log.Fatalf("Error copying file: %s", err)
-		os.Exit(1)
+		return oldHash
 	}
 
 	return string(hash.Sum(nil))
 }
 
-func TransformWatch(args models.Args, debug bool) {
+func TransformWatch(args models.Args, debug bool, httpServer bool) {
 	// use fsnotify to watch for changes
 	watcher, err := fsnotify.NewWatcher()
 
@@ -50,10 +51,16 @@ func TransformWatch(args models.Args, debug bool) {
 		os.Exit(1)
 	}
 
+	if httpServer {
+		go func() {
+			httpserver.HttpServer(args)
+		}()
+	}
+
 	done := make(chan bool)
 
 	go func() {
-		oldHash := GenerateSourceFileChecksum(args)
+		oldHash := GenerateSourceFileChecksum(args, "")
 
 		for {
 			select {
@@ -62,10 +69,11 @@ func TransformWatch(args models.Args, debug bool) {
 					continue
 				}
 
-				newHash := GenerateSourceFileChecksum(args)
+				newHash := GenerateSourceFileChecksum(args, oldHash)
 
 				if oldHash != newHash {
 					Transform(args, false)
+					httpserver.SetReload()
 
 					fmt.Println("== Successfully transformed to markdown...")
 

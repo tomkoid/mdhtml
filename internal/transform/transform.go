@@ -76,7 +76,9 @@ func transformMarkdownToHTML(args models.Args) bool {
 			os.Exit(1)
 		}
 
-		html = append(html, fmt.Sprintf("<style>\n%s\n</style>", style)...)
+		liveReloadString := "<script src='/reload.js' defer></script>"
+
+		html = append(html, fmt.Sprintf("<style>\n%s\n</style>\n%s", style, liveReloadString)...)
 	}
 
 	err = os.WriteFile(args.Out, html, 0644)

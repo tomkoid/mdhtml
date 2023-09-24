@@ -13,7 +13,7 @@ func main() {
 
 	if args.Watch {
 		fmt.Printf("== Watching %s for changes...\n", args.File)
-		transform.TransformWatch(args, true)
+		transform.TransformWatch(args, true, args.HttpServer)
 		return
 	}
 
