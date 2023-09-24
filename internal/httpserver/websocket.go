@@ -26,7 +26,10 @@ func WSEndpoint(c echo.Context) error {
 
 		for {
 			if Reload {
-				fmt.Printf("> Sending message to %s using websocket to reload client...\n", c.Request().RemoteAddr)
+				if args.Debug {
+					fmt.Printf("> Sending message to %s using websocket to reload client...\n", c.Request().RemoteAddr)
+				}
+
 				err := websocket.Message.Send(ws, "reload")
 
 				if err != nil {
