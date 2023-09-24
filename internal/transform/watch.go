@@ -80,8 +80,6 @@ func TransformWatch(args models.Args, debug bool, httpServer bool) {
 
 				eventOk := checkEventType(event)
 				if !eventOk {
-					fmt.Println("== Event not ok", event.Op)
-
 					err := watcher.Add(event.Name)
 
 					if err != nil {
