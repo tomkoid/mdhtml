@@ -10,9 +10,19 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func setupRoutes(app *echo.Echo, args models.Args) {
+func setupRoutes(app *echo.Group, args models.Args) {
+	// MIDDLEWARE: pass args to every route
+	app.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			c.Set("args", args)
+			return next(c)
+		}
+	})
+
 	app.GET("/", func(c echo.Context) error {
-		fmt.Printf("> Access from %s to HTTP server\n", c.Request().RemoteAddr)
+		if args.Debug {
+			fmt.Printf("> Access from %s to HTTP server\n", c.Request().RemoteAddr)
+		}
 
 		// read file contents
 		contents, err := os.ReadFile(args.Out)

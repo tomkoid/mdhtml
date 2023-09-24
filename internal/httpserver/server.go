@@ -31,7 +31,10 @@ func HttpServer(args models.Args) {
 		}))
 	}
 
-	setupRoutes(app, args)
+	// Create a new router
+	router := app.Group("") // root group
+
+	setupRoutes(router, args)
 
 	app.Logger.Fatal(app.Start(fmt.Sprintf("%s:%d", args.ServerHostname, args.ServerPort)))
 }
