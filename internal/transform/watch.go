@@ -33,6 +33,14 @@ func GenerateSourceFileChecksum(args models.Args, oldHash string) string {
 	return string(hash.Sum(nil))
 }
 
+func checkEventType(event fsnotify.Event) bool {
+	if event.Op&fsnotify.Remove == fsnotify.Remove {
+		return false
+	}
+
+	return true
+}
+
 func TransformWatch(args models.Args, debug bool, httpServer bool) {
 	// use fsnotify to watch for changes
 	watcher, err := fsnotify.NewWatcher()
@@ -65,7 +73,22 @@ func TransformWatch(args models.Args, debug bool, httpServer bool) {
 		for {
 			select {
 			case event, ok := <-watcher.Events:
+				// event matching
 				if !ok {
+					continue
+				}
+
+				eventOk := checkEventType(event)
+				if !eventOk {
+					fmt.Println("== Event not ok", event.Op)
+
+					err := watcher.Add(event.Name)
+
+					if err != nil {
+						log.Fatalf("Error adding file to watcher: %s", err)
+						os.Exit(1)
+					}
+
 					continue
 				}
 
