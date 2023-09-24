@@ -15,7 +15,9 @@ func ParseArgs() models.Args {
 	out := flag.StringP("out", "o", "", "The destination file to write the HTML to")
 	style := flag.StringP("style", "s", "", "Apply extra styling to the HTML using a CSS file")
 	watch := flag.BoolP("watch", "w", false, "Watch the source file for changes and reconvert when changes are detected")
-	httpserver := flag.BoolP("httpserver", "H", false, "Start a HTTP server to serve the HTML file and reload the page when changes are detected")
+	httpServer := flag.BoolP("httpserver", "H", false, "Start a HTTP server to serve the HTML file and reload the page when changes are detected")
+	serverPort := flag.IntP("port", "p", 8080, "The port to use for the HTTP server")
+	serverHostname := flag.StringP("hostname", "h", "localhost", "The hostname to use for the HTTP server")
 	debug := flag.BoolP("debug", "d", false, "Enable debug mode")
 
 	flag.Parse()
@@ -31,17 +33,19 @@ func ParseArgs() models.Args {
 	}
 
 	// enable watch mode if httpserver is enabled
-	if *httpserver {
+	if *httpServer {
 		*watch = true
 	}
 
 	// return instance of Args
 	return models.Args{
-		File:       *file,
-		Out:        *out,
-		Style:      *style,
-		Watch:      *watch,
-		HttpServer: *httpserver,
-		Debug:      *debug,
+		File:           *file,
+		Out:            *out,
+		Style:          *style,
+		Watch:          *watch,
+		HttpServer:     *httpServer,
+		ServerPort:     *serverPort,
+		ServerHostname: *serverHostname,
+		Debug:          *debug,
 	}
 }

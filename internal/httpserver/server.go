@@ -2,6 +2,7 @@ package httpserver
 
 import (
 	"embed"
+	"fmt"
 
 	"codeberg.org/Tomkoid/mdhtml/internal/models"
 	"github.com/labstack/echo/v4"
@@ -32,5 +33,5 @@ func HttpServer(args models.Args) {
 
 	setupRoutes(app, args)
 
-	app.Logger.Fatal(app.Start(":8080"))
+	app.Logger.Fatal(app.Start(fmt.Sprintf("%s:%d", args.ServerHostname, args.ServerPort)))
 }
