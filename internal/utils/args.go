@@ -30,6 +30,11 @@ func ParseArgs() models.Args {
 		*out = fmt.Sprintf("%s.html", split[0])
 	}
 
+	// enable watch mode if httpserver is enabled
+	if *httpserver {
+		*watch = true
+	}
+
 	// return instance of Args
 	return models.Args{
 		File:       *file,
