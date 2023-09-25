@@ -73,7 +73,6 @@ func TransformWatch(args models.Args, debug bool, httpServer bool) {
 		for {
 			select {
 			case event, ok := <-watcher.Events:
-				// event matching
 				if !ok {
 					continue
 				}
@@ -94,10 +93,9 @@ func TransformWatch(args models.Args, debug bool, httpServer bool) {
 
 				if oldHash != newHash {
 					Transform(args, false)
-					httpserver.SetReload()
-
 					fmt.Println("== Successfully transformed to markdown...")
 
+					httpserver.SetReload()
 					oldHash = newHash
 				}
 

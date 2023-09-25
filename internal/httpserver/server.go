@@ -13,7 +13,7 @@ import (
 var f embed.FS
 var data, err = f.ReadFile("scripts/reload.js")
 
-var Reload bool = false
+var Reload = false
 
 func SetReload() {
 	Reload = true
