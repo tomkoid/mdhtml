@@ -2,6 +2,7 @@ package httpserver
 
 import (
 	"fmt"
+	"time"
 
 	"codeberg.org/Tomkoid/mdhtml/internal/models"
 	"github.com/labstack/echo/v4"
@@ -24,7 +25,12 @@ func WSEndpoint(c echo.Context) error {
 
 		defer ws.Close()
 
-		for <-Reload {
+		for {
+			if !Reload {
+				time.Sleep(50 * time.Millisecond)
+				continue
+			}
+
 			if args.Debug {
 				fmt.Printf("> Sending message to %s using websocket to reload client...\n", c.Request().RemoteAddr)
 			}
@@ -38,6 +44,10 @@ func WSEndpoint(c echo.Context) error {
 			Reload = false
 		}
 	}))}.ServeHTTP(c.Response(), c.Request())
+
+	if args.Debug {
+		fmt.Println("> Client disconnected")
+	}
 
 	return nil
 }
