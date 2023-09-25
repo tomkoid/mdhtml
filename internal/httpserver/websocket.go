@@ -24,20 +24,18 @@ func WSEndpoint(c echo.Context) error {
 
 		defer ws.Close()
 
-		for {
-			if Reload {
-				if args.Debug {
-					fmt.Printf("> Sending message to %s using websocket to reload client...\n", c.Request().RemoteAddr)
-				}
-
-				err := websocket.Message.Send(ws, "reload")
-
-				if err != nil {
-					continue
-				}
-
-				Reload = false
+		for <-Reload {
+			if args.Debug {
+				fmt.Printf("> Sending message to %s using websocket to reload client...\n", c.Request().RemoteAddr)
 			}
+
+			err := websocket.Message.Send(ws, "reload")
+
+			if err != nil {
+				continue
+			}
+
+			Reload = false
 		}
 	}))}.ServeHTTP(c.Response(), c.Request())
 

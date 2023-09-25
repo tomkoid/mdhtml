@@ -73,7 +73,6 @@ func TransformWatch(args models.Args, debug bool, httpServer bool) {
 		for {
 			select {
 			case event, ok := <-watcher.Events:
-				// event matching
 				if !ok {
 					continue
 				}
