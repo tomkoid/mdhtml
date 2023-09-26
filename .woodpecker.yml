@@ -1,5 +1,6 @@
 steps:
-  build:
+  mdhtml:
     image: golang
     commands:
       - go build
+      - go test ./...
