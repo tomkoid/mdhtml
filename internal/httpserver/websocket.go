@@ -2,6 +2,7 @@ package httpserver
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"codeberg.org/Tomkoid/mdhtml/internal/models"
@@ -38,6 +39,9 @@ func WSEndpoint(c echo.Context) error {
 			err := websocket.Message.Send(ws, "reload")
 
 			if err != nil {
+				if args.Debug {
+					log.Printf("> Error sending message to %s using websocket to reload client: %s\n", c.Request().RemoteAddr, err)
+				}
 				continue
 			}
 

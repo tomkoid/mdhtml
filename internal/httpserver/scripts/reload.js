@@ -7,24 +7,31 @@ if (loc.protocol === 'https:') {
 uri += '//' + loc.host;
 uri += loc.pathname + 'ws';
 
-ws = new WebSocket(uri)
-
 const socket = new WebSocket(uri);
+
+console.log('[websocket] connecting...')
 
 socket.onopen = () => {
   console.log('[websocket] connected');
   socket.send('connected');
+
 }
 
-socket.onmessage = (event) => {
+socket.onmessage = async (event) => {
   if (event.data === 'hello') {
     console.log('[websocket] server responded!');
     return
   }
   console.log(`[websocket] message: ${event.data}`);
   if (event.data === 'reload') {
-    socket.close()
-    window.location.reload();
+    const content = await fetch('/');
+    const html = await content.text();
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // use the new body instead of the old one
+    document.body = doc.body;
   }
 }
 

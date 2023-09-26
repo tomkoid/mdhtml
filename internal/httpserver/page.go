@@ -23,7 +23,7 @@ func Page(c echo.Context) error {
 	if err != nil {
 		log.Fatalf("Error reading file: %s", err)
 
-		return c.String(http.StatusOK, fmt.Sprintf("Error reading file: %s", err))
+		return c.String(http.StatusInternalServerError, fmt.Sprintf("Error reading file: %s", err))
 	}
 
 	// return html content type
