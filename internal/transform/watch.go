@@ -10,6 +10,7 @@ import (
 	"codeberg.org/Tomkoid/mdhtml/internal/httpserver"
 	"codeberg.org/Tomkoid/mdhtml/internal/models"
 	"codeberg.org/Tomkoid/mdhtml/internal/utils"
+	"github.com/fatih/color"
 	"github.com/fsnotify/fsnotify"
 )
 
@@ -93,7 +94,12 @@ func TransformWatch(args models.Args, debug bool, httpServer bool) {
 
 				if oldHash != newHash {
 					Transform(args, false)
-					fmt.Println("== Successfully transformed to markdown...")
+
+					color.Set(color.FgGreen)
+					fmt.Print("==")
+					color.Unset()
+
+					fmt.Println(" Successfully transformed to markdown!")
 
 					httpserver.SetReload()
 					oldHash = newHash
