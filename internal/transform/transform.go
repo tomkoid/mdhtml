@@ -77,10 +77,11 @@ func transformMarkdownToHTML(args models.Args) bool {
 			log.Fatalf("Error reading style file: %s", err)
 			os.Exit(1)
 
-			liveReloadString := "<script src='/reload.js' defer></script>"
-
-			html = append(html, fmt.Sprintf("<style>\n%s\n</style>\n%s", style, liveReloadString)...)
 		}
+
+		liveReloadString := "<script src='/reload.js' defer></script>"
+		html = append(html, fmt.Sprintf("<style>\n%s\n</style>\n%s", style, liveReloadString)...)
+
 	} else {
 		html = append(html, fmt.Sprintf("\n%s", liveReloadString)...)
 	}
