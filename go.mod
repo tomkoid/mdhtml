@@ -1,6 +1,6 @@
 module codeberg.org/Tomkoid/mdhtml
 
-go 1.21.0
+go 1.20
 
 require (
 	github.com/briandowns/spinner v1.23.0
