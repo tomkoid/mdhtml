@@ -14,8 +14,8 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
-func GenerateSourceFileChecksum(args models.Args, oldHash string) string {
-	file, err := os.Open(args.File)
+func GenerateChecksum(filePath string, oldHash string) string {
+	file, err := os.Open(filePath)
 	if err != nil {
 		log.Printf("Error opening file: %s", err)
 		return oldHash
@@ -32,6 +32,27 @@ func GenerateSourceFileChecksum(args models.Args, oldHash string) string {
 	}
 
 	return string(hash.Sum(nil))
+}
+
+func GenerateSourceFileChecksum(args models.Args, oldHash string) string {
+	var srcFileChecksum string = ""
+	var styleFileChecksum string = ""
+
+	var hashString string
+
+	srcFileChecksum = GenerateChecksum(args.File, oldHash)
+
+	if args.Style != "" {
+		styleFileChecksum = GenerateChecksum(args.Style, oldHash)
+	}
+
+	if styleFileChecksum != "" {
+		hashString = srcFileChecksum + styleFileChecksum
+	} else {
+		hashString = srcFileChecksum
+	}
+
+	return hashString
 }
 
 func checkEventType(event fsnotify.Event) bool {
