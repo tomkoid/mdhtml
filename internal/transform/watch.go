@@ -87,6 +87,13 @@ func TransformWatch(args models.Args, debug bool, httpServer bool) {
 		}()
 	}
 
+	var watchFiles []string
+	watchFiles = append(watchFiles, args.File)
+
+	if args.Style != "" {
+		watchFiles = append(watchFiles, args.Style)
+	}
+
 	done := make(chan bool)
 
 	go func() {
@@ -137,11 +144,13 @@ func TransformWatch(args models.Args, debug bool, httpServer bool) {
 		}
 	}()
 
-	err = watcher.Add(args.File)
-	if err != nil {
-		log.Fatalf("Error adding file to watcher: %s", err)
-		os.Exit(1)
-	}
+	for _, element := range watchFiles {
+		err = watcher.Add(element)
+		if err != nil {
+			log.Fatalf("Error adding file to watcher: %s", err)
+			os.Exit(1)
+		}
 
+	}
 	<-done
 }
