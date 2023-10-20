@@ -13,6 +13,13 @@
       in
       {
         defaultPackage = (import ./default.nix { inherit pkgs; });
+        devShells.default = pkgs.mkShell
+          {
+            buildInputs = with pkgs; [
+              go
+              golangci-lint
+            ];
+          };
       }
     );
 }
