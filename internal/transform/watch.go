@@ -10,11 +10,12 @@ import (
 	"codeberg.org/Tomkoid/mdhtml/internal/httpserver"
 	"codeberg.org/Tomkoid/mdhtml/internal/models"
 	"codeberg.org/Tomkoid/mdhtml/internal/utils"
+	"github.com/fatih/color"
 	"github.com/fsnotify/fsnotify"
 )
 
-func GenerateSourceFileChecksum(args models.Args, oldHash string) string {
-	file, err := os.Open(args.File)
+func GenerateChecksum(filePath string, oldHash string) string {
+	file, err := os.Open(filePath)
 	if err != nil {
 		log.Printf("Error opening file: %s", err)
 		return oldHash
@@ -31,6 +32,27 @@ func GenerateSourceFileChecksum(args models.Args, oldHash string) string {
 	}
 
 	return string(hash.Sum(nil))
+}
+
+func GenerateSourceFileChecksum(args models.Args, oldHash string) string {
+	var srcFileChecksum string = ""
+	var styleFileChecksum string = ""
+
+	var hashString string
+
+	srcFileChecksum = GenerateChecksum(args.File, oldHash)
+
+	if args.Style != "" {
+		styleFileChecksum = GenerateChecksum(args.Style, oldHash)
+	}
+
+	if styleFileChecksum != "" {
+		hashString = srcFileChecksum + styleFileChecksum
+	} else {
+		hashString = srcFileChecksum
+	}
+
+	return hashString
 }
 
 func checkEventType(event fsnotify.Event) bool {
@@ -65,6 +87,13 @@ func TransformWatch(args models.Args, debug bool, httpServer bool) {
 		}()
 	}
 
+	var watchFiles []string
+	watchFiles = append(watchFiles, args.File)
+
+	if args.Style != "" {
+		watchFiles = append(watchFiles, args.Style)
+	}
+
 	done := make(chan bool)
 
 	go func() {
@@ -93,7 +122,12 @@ func TransformWatch(args models.Args, debug bool, httpServer bool) {
 
 				if oldHash != newHash {
 					Transform(args, false)
-					fmt.Println("== Successfully transformed to markdown...")
+
+					color.Set(color.FgGreen)
+					fmt.Print("==")
+					color.Unset()
+
+					fmt.Println(" Successfully transformed to markdown!")
 
 					httpserver.SetReload()
 					oldHash = newHash
@@ -110,11 +144,13 @@ func TransformWatch(args models.Args, debug bool, httpServer bool) {
 		}
 	}()
 
-	err = watcher.Add(args.File)
-	if err != nil {
-		log.Fatalf("Error adding file to watcher: %s", err)
-		os.Exit(1)
-	}
+	for _, element := range watchFiles {
+		err = watcher.Add(element)
+		if err != nil {
+			log.Fatalf("Error adding file to watcher: %s", err)
+			os.Exit(1)
+		}
 
+	}
 	<-done
 }
