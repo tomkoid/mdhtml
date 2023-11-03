@@ -26,8 +26,10 @@ func WSEndpoint(c echo.Context) error {
 
 		defer ws.Close()
 
+		localHistory := History
+
 		for {
-			if !Reload {
+			if localHistory == History {
 				time.Sleep(50 * time.Millisecond)
 				continue
 			}
@@ -45,7 +47,7 @@ func WSEndpoint(c echo.Context) error {
 				continue
 			}
 
-			Reload = false
+			localHistory = History
 		}
 	}))}.ServeHTTP(c.Response(), c.Request())
 
