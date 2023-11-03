@@ -9,13 +9,13 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-//go:embed scripts/reload.js
-//go:embed scripts/prism.js
-//go:embed scripts/prism.css
+//go:embed assets/reload.js
+//go:embed assets/prism.js
+//go:embed assets/prism.css
 var f embed.FS
-var reloadData, reloadDataErr = f.ReadFile("scripts/reload.js")
-var prismJSData, prismJSErr = f.ReadFile("scripts/prism.js")
-var prismCSSData, prismCSSErr = f.ReadFile("scripts/prism.css")
+var reloadData, reloadDataErr = f.ReadFile("assets/reload.js")
+var prismJSData, prismJSErr = f.ReadFile("assets/prism.js")
+var prismCSSData, prismCSSErr = f.ReadFile("assets/prism.css")
 
 var History = 0
 
