@@ -33,6 +33,15 @@ function connect() {
 
       // use the new body instead of the old one
       document.body = doc.body;
+
+      // reload the scripts
+      const scripts = document.querySelectorAll('script');
+      scripts.forEach((script) => {
+        const newScript = document.createElement('script');
+        newScript.src = script.src;
+        newScript.async = false;
+        document.body.appendChild(newScript);
+      });
     }
   }
 

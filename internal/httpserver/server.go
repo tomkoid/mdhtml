@@ -10,8 +10,12 @@ import (
 )
 
 //go:embed scripts/reload.js
+//go:embed scripts/prism.js
+//go:embed scripts/prism.css
 var f embed.FS
-var data, err = f.ReadFile("scripts/reload.js")
+var reloadData, reloadDataErr = f.ReadFile("scripts/reload.js")
+var prismJSData, prismJSErr = f.ReadFile("scripts/prism.js")
+var prismCSSData, prismCSSErr = f.ReadFile("scripts/prism.css")
 
 var History = 0
 
