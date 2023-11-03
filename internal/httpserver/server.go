@@ -13,10 +13,10 @@ import (
 var f embed.FS
 var data, err = f.ReadFile("scripts/reload.js")
 
-var Reload = false
+var History = 0
 
 func SetReload() {
-	Reload = true
+	History++
 }
 
 func HttpServer(args models.Args) {
