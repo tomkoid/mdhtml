@@ -22,6 +22,17 @@ func setupRoutes(app *echo.Group, args models.Args) {
 
 	app.GET("/reload.js", func(c echo.Context) error {
 		c.Response().Header().Set("Content-Type", "application/javascript")
-		return c.String(http.StatusOK, string(data))
+		return c.String(http.StatusOK, string(reloadData))
+	})
+
+	// syntax highlighting
+	app.GET("/prism.js", func(c echo.Context) error {
+		c.Response().Header().Set("Content-Type", "application/javascript")
+		return c.String(http.StatusOK, string(prismJSData))
+	})
+
+	app.GET("/prism.css", func(c echo.Context) error {
+		c.Response().Header().Set("Content-Type", "application/css")
+		return c.String(http.StatusOK, string(prismCSSData))
 	})
 }

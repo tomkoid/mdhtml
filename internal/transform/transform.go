@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"codeberg.org/Tomkoid/mdhtml/internal/models"
@@ -68,7 +69,19 @@ func transformMarkdownToHTML(args models.Args) bool {
 
 	html := markdown.ToHTML(content, nil, nil)
 
-	liveReloadString := "<script src='/reload.js' defer></script>"
+	prismData := `
+    <script src="/prism.js" defer></script>
+    <link rel="stylesheet" href="/prism.css">
+    `
+
+	// if content includes code block
+	if !strings.Contains(string(content), "```") {
+		prismData = ``
+	}
+
+	headData := `
+    <script src="/reload.js" defer></script>
+  ` + prismData
 
 	// apply styling if provided
 	if args.Style != "" {
@@ -79,11 +92,10 @@ func transformMarkdownToHTML(args models.Args) bool {
 
 		}
 
-		liveReloadString := "<script src='/reload.js' defer></script>"
-		html = append(html, fmt.Sprintf("<style>\n%s\n</style>\n%s", style, liveReloadString)...)
+		html = append(html, fmt.Sprintf("<style>\n%s\n</style>\n%s", style, headData)...)
 
 	} else {
-		html = append(html, fmt.Sprintf("\n%s", liveReloadString)...)
+		html = append(html, fmt.Sprintf("\n%s", headData)...)
 	}
 
 	err = os.WriteFile(args.Out, html, 0644)
