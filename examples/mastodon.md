@@ -5,6 +5,8 @@ Mastodon is free and open-source software for running self-hosted social network
 console.log("Hello World");
 ```
 
+- [Mastodon](https://joinmastodon.org/)
+
 # How it works
 Each user is a member of a specific Mastodon instance (also called a server), which can interoperate as a federated social network, allowing users on different instances to interact with each other. This is intended to give users the flexibility to choose instance which they like. Mastodon is also part of the Fediverse, which is a giant circle of servers that can communicate with each other. Mastodon is crowdfunded and does not contain ads.
 
