@@ -1,6 +1,7 @@
 # Test files
-*.html
-*.css
+examples/*.html
+internal/transform/*.html
+examples/*.css
 
 # Binaries
 /mdhtml
