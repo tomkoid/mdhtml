@@ -80,6 +80,7 @@ func transformMarkdownToHTML(args models.Args) bool {
 	}
 
 	headData := `
+    <link rel="stylesheet" href="/default.css">
     <script src="/reload.js" defer></script>
   ` + prismData
 

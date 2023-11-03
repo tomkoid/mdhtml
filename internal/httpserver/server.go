@@ -9,10 +9,12 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
+//go:embed assets/default.css
 //go:embed assets/reload.js
 //go:embed assets/prism.js
 //go:embed assets/prism.css
 var f embed.FS
+var defaultCSSData, defaultCSSDataErr = f.ReadFile("assets/default.css")
 var reloadData, reloadDataErr = f.ReadFile("assets/reload.js")
 var prismJSData, prismJSErr = f.ReadFile("assets/prism.js")
 var prismCSSData, prismCSSErr = f.ReadFile("assets/prism.css")
