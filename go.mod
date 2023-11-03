@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/briandowns/spinner v1.23.0
 	github.com/fatih/color v1.15.0
-	github.com/fsnotify/fsnotify v1.6.0
+	github.com/fsnotify/fsnotify v1.7.0
 	github.com/gomarkdown/markdown v0.0.0-20230922112808-5421fefb8386
 	github.com/labstack/echo/v4 v4.11.2
 	github.com/spf13/pflag v1.0.5
