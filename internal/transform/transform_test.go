@@ -57,7 +57,7 @@ func TestTransform(t *testing.T) {
 	}
 
 	// if HTML is the same
-	if html != "<h1>Test</h1><style>body{background-color:red;}</style><scriptsrc='/reload.js'defer></script>" {
+	if html != "<h1>Test</h1><style>body{background-color:red;}</style><scriptsrc=\"/reload.js\"defer></script>" {
 		t.Errorf("Error: HTML is not the same as expected: %s", html)
 	}
 
