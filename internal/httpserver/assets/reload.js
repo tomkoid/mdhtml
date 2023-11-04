@@ -16,6 +16,11 @@ function connect() {
     console.log('[websocket] connected');
     socket.send('connected');
 
+    // send a ping every 30 seconds to keep the connection alive
+    setInterval(() => {
+      console.log('[websocket] sending ping');
+      socket.send('ping');
+    }, 30000);
   }
 
   socket.onmessage = async (event) => {
@@ -37,6 +42,12 @@ function connect() {
       // reload the scripts
       const scripts = document.querySelectorAll('script');
       scripts.forEach((script) => {
+        if (script.src.includes('reload.js')) {
+          return;
+        }
+
+        console.log(`[DOM] reloading script: ${script.src}`);
+
         const newScript = document.createElement('script');
         newScript.src = script.src;
         newScript.async = false;
@@ -46,21 +57,15 @@ function connect() {
   }
 
   socket.onclose = () => {
-    console.log('[websocket] disconnected');
-    console.log("reconnecting...")
+    console.log('[websocket] connection closed');
 
-    socket.close();
-
-    setTimeout(() => {
-      connect();
-    }, 1000);
+    alert("Connection to server lost. Please refresh the page to reconnect.")
   }
 
   socket.onerror = (error) => {
-    console.log(`[websocket] error: ${error}`);
+    console.log(`[websocket] error: ${error.message}`);
     console.log(error)
 
-    // this will go to the onclose function
     socket.close();
   }
 }

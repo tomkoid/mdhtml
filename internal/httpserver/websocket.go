@@ -44,7 +44,8 @@ func WSEndpoint(c echo.Context) error {
 				if args.Debug {
 					log.Printf("> Error sending message to %s using websocket to reload client: %s\n", c.Request().RemoteAddr, err)
 				}
-				continue
+
+				break
 			}
 
 			localHistory = History
