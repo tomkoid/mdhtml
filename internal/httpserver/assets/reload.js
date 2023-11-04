@@ -15,6 +15,12 @@ function connect() {
   socket.onopen = () => {
     console.log('[websocket] connected');
     socket.send('connected');
+
+    // send a ping every 30 seconds to keep the connection alive
+    setInterval(() => {
+      console.log('[websocket] sending ping');
+      socket.send('ping');
+    }, 30000);
   }
 
   socket.onmessage = async (event) => {
@@ -39,6 +45,8 @@ function connect() {
         if (script.src.includes('reload.js')) {
           return;
         }
+
+        console.log(`[DOM] reloading script: ${script.src}`);
 
         const newScript = document.createElement('script');
         newScript.src = script.src;
