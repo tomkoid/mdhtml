@@ -3,7 +3,6 @@ package httpserver
 import (
 	"fmt"
 	"log"
-	"strings"
 	"time"
 
 	"codeberg.org/Tomkoid/mdhtml/internal/models"
