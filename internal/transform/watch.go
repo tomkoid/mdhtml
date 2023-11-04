@@ -106,6 +106,8 @@ func TransformWatch(args models.Args, debug bool, httpServer bool) {
 					continue
 				}
 
+				println(event.Name)
+
 				eventOk := checkEventType(event)
 				if !eventOk {
 					err := watcher.Add(event.Name)

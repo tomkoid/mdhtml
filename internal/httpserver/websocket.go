@@ -3,6 +3,7 @@ package httpserver
 import (
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"codeberg.org/Tomkoid/mdhtml/internal/models"
@@ -44,6 +45,11 @@ func WSEndpoint(c echo.Context) error {
 				if args.Debug {
 					log.Printf("> Error sending message to %s using websocket to reload client: %s\n", c.Request().RemoteAddr, err)
 				}
+
+				if strings.Contains(err.Error(), "broken pipe") {
+					break
+				}
+
 				continue
 			}
 
