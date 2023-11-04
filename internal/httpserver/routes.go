@@ -17,9 +17,11 @@ func setupRoutes(app *echo.Group, args models.Args) {
 	})
 
 	app.GET("/", Page)
+	app.GET("/info", Info)
 
 	app.Any("/ws", WSEndpoint)
 
+	/// assets
 	app.GET("/default.css", func(c echo.Context) error {
 		c.Response().Header().Set("Content-Type", "application/css")
 		return c.String(http.StatusOK, string(defaultCSSData))
