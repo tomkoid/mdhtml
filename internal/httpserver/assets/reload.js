@@ -37,6 +37,10 @@ function connect() {
       // reload the scripts
       const scripts = document.querySelectorAll('script');
       scripts.forEach((script) => {
+        if (script.src.includes('reload.js')) {
+          return;
+        }
+
         const newScript = document.createElement('script');
         newScript.src = script.src;
         newScript.async = false;
