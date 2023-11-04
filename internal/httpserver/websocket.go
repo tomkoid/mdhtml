@@ -46,11 +46,7 @@ func WSEndpoint(c echo.Context) error {
 					log.Printf("> Error sending message to %s using websocket to reload client: %s\n", c.Request().RemoteAddr, err)
 				}
 
-				if strings.Contains(err.Error(), "broken pipe") {
-					break
-				}
-
-				continue
+				break
 			}
 
 			localHistory = History
