@@ -15,7 +15,6 @@ function connect() {
   socket.onopen = () => {
     console.log('[websocket] connected');
     socket.send('connected');
-
   }
 
   socket.onmessage = async (event) => {
@@ -50,21 +49,15 @@ function connect() {
   }
 
   socket.onclose = () => {
-    console.log('[websocket] disconnected');
-    console.log("reconnecting...")
+    console.log('[websocket] connection closed');
 
-    socket.close();
-
-    setTimeout(() => {
-      connect();
-    }, 1000);
+    alert("Connection to server lost. Please refresh the page to reconnect.")
   }
 
   socket.onerror = (error) => {
-    console.log(`[websocket] error: ${error}`);
+    console.log(`[websocket] error: ${error.message}`);
     console.log(error)
 
-    // this will go to the onclose function
     socket.close();
   }
 }
