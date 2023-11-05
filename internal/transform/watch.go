@@ -121,6 +121,7 @@ func TransformWatch(args models.Args, debug bool, httpServer bool) {
 				newHash := GenerateSourceFileChecksum(args, oldHash)
 
 				if oldHash != newHash {
+					httpserver.BroadcastMessage("transforming")
 					Transform(args, false)
 
 					color.Set(color.FgGreen)
