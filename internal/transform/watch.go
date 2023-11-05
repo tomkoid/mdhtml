@@ -129,7 +129,7 @@ func TransformWatch(args models.Args, debug bool, httpServer bool) {
 
 					fmt.Println(" Successfully transformed to markdown!")
 
-					httpserver.SetReload()
+					httpserver.BroadcastMessage("reload")
 					oldHash = newHash
 				}
 

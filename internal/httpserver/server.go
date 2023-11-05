@@ -29,10 +29,10 @@ type BroadcastData struct {
 	Data  string
 }
 
-func SetReload() {
+func BroadcastMessage(data string) {
 	History = append(History, BroadcastData{
 		Index: broadcastIndex,
-		Data:  "reload",
+		Data:  data,
 	})
 	broadcastIndex++
 }
