@@ -74,8 +74,8 @@ func transformMarkdownToHTML(args models.Args) bool {
     <link rel="stylesheet" href="/prism.css">
     `
 
-	// if content includes code block
-	if !strings.Contains(string(content), "```") {
+	// if content doesnt include any code block or inline code, dont include prism
+	if !strings.Contains(string(content), "```") || args.NoExternalLibs {
 		prismData = ``
 	}
 
