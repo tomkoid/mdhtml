@@ -9,4 +9,5 @@ type Args struct {
 	Debug          bool
 	ServerPort     int
 	ServerHostname string
+	NoExternalLibs bool
 }
