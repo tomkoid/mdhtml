@@ -10,6 +10,29 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+func difference(global []BroadcastData, local []BroadcastData) []string {
+	// give a slice, return a slice
+	var diffMap []string = []string{}
+	for _, h := range global {
+		println("loop")
+		found := false
+		for _, lh := range local {
+			println("h.Index: ", h.Index)
+			println("lh.Index: ", lh.Index)
+			if h.Index == lh.Index {
+				println("YEESS")
+				found = true
+				break
+			}
+		}
+		if !found {
+			println("not found: ", h.Data)
+			diffMap = append(diffMap, h.Data)
+		}
+	}
+	return diffMap
+}
+
 func WSEndpoint(c echo.Context) error {
 	args := c.Get("args").(models.Args)
 
@@ -34,29 +57,38 @@ func WSEndpoint(c echo.Context) error {
 			// 	continue
 			// }
 
-			// println("localHistory: ", localHistory)
 			// println("History: ", History)
 
 			// get the difference between the two slices
 			// https://stackoverflow.com/a/45485900
-			var diff []string = []string{}
-			for _, h := range History {
-				found := false
-				for _, lh := range localHistory {
-					if h == lh {
-						found = true
-						break
-					}
-				}
-				if !found {
-					diff = append(diff, h)
-				}
-			}
-			for _, value := range History {
-				fmt.Printf("- %s\n", value)
+			// var diff []string = []string{}
+			// for _, h := range History {
+			// 	found := false
+			// 	for _, lh := range localHistory {
+			// 		if h == lh {
+			// 			found = true
+			// 			break
+			// 		}
+			// 	}
+			// 	if !found {
+			// 		diff = append(diff, h)
+			// 	}
+			// }
+			var diff []string = difference(History, localHistory)
+
+			for _, value := range localHistory {
+				fmt.Printf("local: - %s\n", value)
 			}
 
-			println(len(diff))
+			for _, value := range History {
+				fmt.Printf("global: - %s\n", value)
+			}
+
+			for _, value := range diff {
+				fmt.Printf("diff: - %s\n", value)
+			}
+
+			println("diff:", len(diff))
 			if len(diff) == 0 {
 				time.Sleep(50 * time.Millisecond)
 				continue
@@ -78,6 +110,7 @@ func WSEndpoint(c echo.Context) error {
 					log.Printf("> Error sending message to %s using websocket to reload client: %s\n", c.Request().RemoteAddr, err)
 				}
 
+				localHistory = History
 				break
 			}
 
