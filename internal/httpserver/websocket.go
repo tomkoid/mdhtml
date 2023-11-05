@@ -11,21 +11,16 @@ import (
 )
 
 func difference(global []BroadcastData, local []BroadcastData) []string {
-	// give a slice, return a slice
 	var diffMap []string = []string{}
 	for _, h := range global {
-		// println("loop")
 		found := false
 		for _, lh := range local {
-			// println("h.Index: ", h.Index)
-			// println("lh.Index: ", lh.Index)
 			if h.Index == lh.Index {
 				found = true
 				break
 			}
 		}
 		if !found {
-			// println("not found: ", h.Data)
 			diffMap = append(diffMap, h.Data)
 		}
 	}
@@ -51,49 +46,12 @@ func WSEndpoint(c echo.Context) error {
 		localHistory := History
 
 		for {
-			// if reflect.DeepEqual(localHistory, History) {
-			// 	time.Sleep(50 * time.Millisecond)
-			// 	continue
-			// }
-
-			// println("History: ", History)
-
-			// get the difference between the two slices
-			// https://stackoverflow.com/a/45485900
-			// var diff []string = []string{}
-			// for _, h := range History {
-			// 	found := false
-			// 	for _, lh := range localHistory {
-			// 		if h == lh {
-			// 			found = true
-			// 			break
-			// 		}
-			// 	}
-			// 	if !found {
-			// 		diff = append(diff, h)
-			// 	}
-			// }
 			var diff []string = difference(History, localHistory)
 
-			// for _, value := range localHistory {
-			// 	fmt.Printf("local: - %s\n", value)
-			// }
-			//
-			// for _, value := range History {
-			// 	fmt.Printf("global: - %s\n", value)
-			// }
-
-			// for _, value := range diff {
-			// 	fmt.Printf("diff: - %s\n", value)
-			// }
-
-			// println("diff:", len(diff))
 			if len(diff) == 0 {
 				time.Sleep(50 * time.Millisecond)
 				continue
 			}
-
-			// println("diff: ", diff)
 
 			if args.Debug {
 				fmt.Printf("> Sending message to %s using websocket to reload client...\n", c.Request().RemoteAddr)
