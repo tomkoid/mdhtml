@@ -29,10 +29,43 @@ func WSEndpoint(c echo.Context) error {
 		localHistory := History
 
 		for {
-			if localHistory == History {
+			// if reflect.DeepEqual(localHistory, History) {
+			// 	time.Sleep(50 * time.Millisecond)
+			// 	continue
+			// }
+
+			// println("localHistory: ", localHistory)
+			// println("History: ", History)
+
+			// get the difference between the two slices
+			// https://stackoverflow.com/a/45485900
+			var diff []string = []string{}
+			for _, h := range History {
+				found := false
+				for _, lh := range localHistory {
+					if h == lh {
+						found = true
+						break
+					}
+				}
+				if !found {
+					diff = append(diff, h)
+				}
+			}
+			for _, value := range History {
+				fmt.Printf("- %s\n", value)
+			}
+
+			println(len(diff))
+			if len(diff) == 0 {
 				time.Sleep(50 * time.Millisecond)
 				continue
 			}
+
+			println("diff: ", diff)
+
+			// please dont forget to remove this later lol
+			// diff = []string{}
 
 			if args.Debug {
 				fmt.Printf("> Sending message to %s using websocket to reload client...\n", c.Request().RemoteAddr)

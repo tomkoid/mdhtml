@@ -19,10 +19,10 @@ var reloadData, reloadDataErr = f.ReadFile("assets/reload.js")
 var prismJSData, prismJSErr = f.ReadFile("assets/prism.js")
 var prismCSSData, prismCSSErr = f.ReadFile("assets/prism.css")
 
-var History = 0
+var History = []string{}
 
 func SetReload() {
-	History++
+	History = append(History, "reload")
 }
 
 func HttpServer(args models.Args) {
