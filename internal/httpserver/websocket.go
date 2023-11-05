@@ -10,6 +10,23 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+func difference(global []BroadcastData, local []BroadcastData) []string {
+	var diffMap []string = []string{}
+	for _, h := range global {
+		found := false
+		for _, lh := range local {
+			if h.Index == lh.Index {
+				found = true
+				break
+			}
+		}
+		if !found {
+			diffMap = append(diffMap, h.Data)
+		}
+	}
+	return diffMap
+}
+
 func WSEndpoint(c echo.Context) error {
 	args := c.Get("args").(models.Args)
 
@@ -29,7 +46,9 @@ func WSEndpoint(c echo.Context) error {
 		localHistory := History
 
 		for {
-			if localHistory == History {
+			var diff []string = difference(History, localHistory)
+
+			if len(diff) == 0 {
 				time.Sleep(50 * time.Millisecond)
 				continue
 			}
@@ -38,14 +57,17 @@ func WSEndpoint(c echo.Context) error {
 				fmt.Printf("> Sending message to %s using websocket to reload client...\n", c.Request().RemoteAddr)
 			}
 
-			err := websocket.Message.Send(ws, "reload")
+			for _, value := range diff {
+				err := websocket.Message.Send(ws, value)
 
-			if err != nil {
-				if args.Debug {
-					log.Printf("> Error sending message to %s using websocket to reload client: %s\n", c.Request().RemoteAddr, err)
+				if err != nil {
+					if args.Debug {
+						log.Printf("> Error sending message to %s using websocket to reload client: %s\n", c.Request().RemoteAddr, err)
+					}
+
+					localHistory = History
+					break
 				}
-
-				break
 			}
 
 			localHistory = History

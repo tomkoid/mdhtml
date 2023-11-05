@@ -18,6 +18,7 @@ func ParseArgs() models.Args {
 	httpServer := flag.BoolP("httpserver", "H", false, "Start a HTTP server to serve the HTML file and reload the page when changes are detected")
 	serverPort := flag.IntP("port", "p", 8080, "The port to use for the HTTP server")
 	serverHostname := flag.StringP("hostname", "h", "localhost", "The hostname to use for the HTTP server")
+	noExternalLibs := flag.BoolP("no-external-libs", "n", false, "Don't use external libraries for CSS and JS")
 	debug := flag.BoolP("debug", "d", false, "Enable debug mode")
 
 	flag.Parse()
@@ -46,6 +47,7 @@ func ParseArgs() models.Args {
 		HttpServer:     *httpServer,
 		ServerPort:     *serverPort,
 		ServerHostname: *serverHostname,
+		NoExternalLibs: *noExternalLibs,
 		Debug:          *debug,
 	}
 }
