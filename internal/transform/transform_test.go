@@ -52,12 +52,12 @@ func TestTransform(t *testing.T) {
 
 	t.Logf("HTML: %s", html)
 	// check if the HTML contains the markdown
-	if !strings.Contains(html, "<h1>Test</h1>") {
+	if !strings.Contains(html, `<h1id="test">Test</h1>`) {
 		t.Errorf("Error: HTML does not contain markdown")
 	}
 
 	// if HTML is the same
-	if html != `<h1>Test</h1><style>body{background-color:red;}</style><linkrel="stylesheet"href="/default.css"><scriptsrc="/reload.js"defer></script>` {
+	if html != `<h1id="test">Test</h1><style>body{background-color:red;}</style><metaname="viewport"content="width=device-width,initial-scale=1"><linkrel="stylesheet"href="/default.css"><scriptsrc="/reload.js"defer></script>` {
 		t.Errorf("Error: HTML is not the same as expected: %s", html)
 	}
 
