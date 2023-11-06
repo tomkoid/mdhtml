@@ -1,4 +1,5 @@
-let wSStatus = 0; // 0 = disconnected, 1 = connected, 2 = connecting
+let wSStatus = 3; // 0 = disconnected, 1 = connected, 2 = connecting, 3 = initial
+let socket;
 
 function connect() {
   var loc = window.location;
@@ -10,7 +11,7 @@ function connect() {
   uri += '//' + loc.host;
   uri += loc.pathname + 'ws';
 
-  const socket = new WebSocket(uri);
+  socket = new WebSocket(uri);
 
   console.log('[websocket] connecting...')
 
@@ -18,11 +19,6 @@ function connect() {
     console.log('[websocket] connected');
     socket.send('connected');
 
-    // send a ping every 30 seconds to keep the connection alive
-    setInterval(() => {
-      console.log('[websocket] sending ping');
-      socket.send('ping');
-    }, 30000);
   }
 
   socket.onmessage = async (event) => {
@@ -108,5 +104,20 @@ async function connectionStatusResolver() {
   }
 }
 
+async function keepConnectionAlive() {
+  while (true) {
+    if (wSStatus !== 0) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      continue;
+    }
+
+    // send a ping every 30 seconds to keep the connection alive
+    console.log('[websocket] sending ping');
+    socket.send('ping');
+    await new Promise((resolve) => setTimeout(resolve, 30000));
+  }
+}
+
 connectionStatusResolver();
 connect();
+keepConnectionAlive();
