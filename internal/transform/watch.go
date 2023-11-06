@@ -63,7 +63,7 @@ func checkEventType(event fsnotify.Event) bool {
 	return true
 }
 
-func TransformWatch(args models.Args, debug bool, httpServer bool) {
+func TransformWatch(args models.Args, httpServer bool) {
 	// check if the out file exists
 	if _, err := os.Stat(args.Out); os.IsNotExist(err) {
 		Transform(args, false)
