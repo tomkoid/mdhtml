@@ -12,6 +12,8 @@ import (
 	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
 	"github.com/gomarkdown/markdown"
+	"github.com/gomarkdown/markdown/html"
+	"github.com/gomarkdown/markdown/parser"
 )
 
 func Transform(args models.Args, debug bool) {
@@ -67,7 +69,7 @@ func transformMarkdownToHTML(args models.Args) bool {
 		os.Exit(1)
 	}
 
-	html := markdown.ToHTML(content, nil, nil)
+	html := mdToHTML(content)
 
 	prismData := `
     <script src="/prism.js" defer></script>
@@ -80,6 +82,7 @@ func transformMarkdownToHTML(args models.Args) bool {
 	}
 
 	headData := `
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="stylesheet" href="/default.css">
     <script src="/reload.js" defer></script>
   ` + prismData
@@ -107,4 +110,18 @@ func transformMarkdownToHTML(args models.Args) bool {
 	}
 
 	return true
+}
+
+func mdToHTML(md []byte) []byte {
+	// create markdown parser with extensions
+	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock
+	p := parser.NewWithExtensions(extensions)
+	doc := p.Parse(md)
+
+	// create HTML renderer with extensions
+	htmlFlags := html.CommonFlags | html.HrefTargetBlank
+	opts := html.RendererOptions{Flags: htmlFlags}
+	renderer := html.NewRenderer(opts)
+
+	return markdown.Render(doc, renderer)
 }
