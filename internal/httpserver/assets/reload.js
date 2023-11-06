@@ -1,4 +1,5 @@
 let wSStatus = 3; // 0 = disconnected, 1 = connected, 2 = connecting, 3 = initial
+let transformStatus = 0; // 0 = not transforming, 1 = transforming
 let socket;
 
 function connect() {
@@ -28,7 +29,13 @@ function connect() {
       return
     }
     console.log(`[websocket] message: ${event.data}`);
+    if (event.data === 'transforming') {
+      transformStatus = 1;
+      return;
+    }
     if (event.data === 'reload') {
+      transformStatus = 0;
+
       const content = await fetch('/');
       const html = await content.text();
 
@@ -89,18 +96,35 @@ function showConnectionStatus(status) {
   }
 }
 
-function deleteConnectionStatus() {
-  const element = document.querySelector('#connection-status');
-  if (element) {
-    element.remove();
+function showTransformStatus(status) {
+  if (status == 0) {
+    return;
+  }
+
+  // create the element if it doesn't exist
+  if (!document.querySelector('#transform-status')) {
+    const div = document.createElement('div');
+    div.id = 'transform-status';
+    div.style = 'position: fixed; bottom: 0; left: 0; background-color: blue; color: white; padding: 5px; font-family: monospace; font-size: 15px; z-index: 9999';
+    div.innerText = "transforming...";
+    document.body.appendChild(div);
   }
 }
 
-async function connectionStatusResolver() {
+function deleteStatuses() {
+  const conStatus = document.querySelector('#connection-status');
+  const transStatus = document.querySelector('#transform-status');
+
+  if (conStatus) conStatus.remove();
+  if (transStatus) transStatus.remove();
+}
+
+async function statusResolver() {
   while (true) {
     showConnectionStatus(wSStatus === 0 ? null : wSStatus === 1 ? 'disconnected' : 'connecting...');
+    showTransformStatus(transformStatus);
     await new Promise((resolve) => setTimeout(resolve, 100));
-    deleteConnectionStatus();
+    deleteStatuses();
   }
 }
 
@@ -118,6 +142,6 @@ async function keepConnectionAlive() {
   }
 }
 
-connectionStatusResolver();
+statusResolver();
 connect();
 keepConnectionAlive();
