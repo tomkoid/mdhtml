@@ -1,3 +1,5 @@
+let wSStatus = 0; // 0 = disconnected, 1 = connected, 2 = connecting
+
 function connect() {
   var loc = window.location;
   var uri = 'ws:';
@@ -25,6 +27,7 @@ function connect() {
 
   socket.onmessage = async (event) => {
     if (event.data === 'hello') {
+      wSStatus = 0;
       console.log('[websocket] server responded!');
       return
     }
@@ -57,9 +60,14 @@ function connect() {
   }
 
   socket.onclose = () => {
-    console.log('[websocket] connection closed');
+    wSStatus = 1;
 
-    alert("Connection to server lost. Please refresh the page to reconnect.")
+    console.log('[websocket] connection closed');
+    setTimeout(() => {
+      wSStatus = 2;
+      console.log('[websocket] reconnecting...');
+      connect();
+    }, 1000);
   }
 
   socket.onerror = (error) => {
@@ -70,4 +78,35 @@ function connect() {
   }
 }
 
+function showConnectionStatus(status) {
+  if (!status) {
+    return;
+  }
+
+  // create the element if it doesn't exist
+  if (!document.querySelector('#connection-status')) {
+    const div = document.createElement('div');
+    div.id = 'connection-status';
+    div.style = 'position: fixed; bottom: 0; right: 0; background-color: red; color: white; padding: 5px; font-family: monospace; font-size: 15px; z-index: 9999';
+    div.innerText = status;
+    document.body.appendChild(div);
+  }
+}
+
+function deleteConnectionStatus() {
+  const element = document.querySelector('#connection-status');
+  if (element) {
+    element.remove();
+  }
+}
+
+async function connectionStatusResolver() {
+  while (true) {
+    showConnectionStatus(wSStatus === 0 ? null : wSStatus === 1 ? 'disconnected' : 'connecting...');
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    deleteConnectionStatus();
+  }
+}
+
+connectionStatusResolver();
 connect();
