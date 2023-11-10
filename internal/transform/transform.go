@@ -119,7 +119,7 @@ func mdToHTML(md []byte) []byte {
 	doc := p.Parse(md)
 
 	// create HTML renderer with extensions
-	htmlFlags := html.CommonFlags | html.HrefTargetBlank
+	htmlFlags := html.CommonFlags | html.HrefTargetBlank | html.LazyLoadImages
 	opts := html.RendererOptions{Flags: htmlFlags}
 	renderer := html.NewRenderer(opts)
 

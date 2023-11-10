@@ -11,6 +11,13 @@ console.log("Hello World");
 - [x] done
 - [ ] undone
 
+Name    | Age
+--------|------
+Bob     ||
+Alice   | 23
+========|======
+Total   | 23
+
 ---
 
 # How it works
