@@ -21,6 +21,7 @@ var (
 	httpserver         bool   = false
 	httpserverPort     int    = 8080
 	httpserverHostname string = "localhost"
+	noExternalLibs     bool   = false
 )
 
 // convertCmd represents the convert command
@@ -59,7 +60,7 @@ var convertCmd = &cobra.Command{
 		transformArgs := models.Args{
 			File:           sourceFile,
 			Style:          stylesheet,
-			NoExternalLibs: false,
+			NoExternalLibs: noExternalLibs,
 			Watch:          watch,
 			HttpServer:     httpserver,
 			ServerPort:     httpserverPort,
@@ -95,4 +96,5 @@ func init() {
 	convertCmd.Flags().BoolVarP(&httpserver, "httpserver", "H", false, "Start a HTTP server to serve the HTML file and reload the page when changes are detected")
 	convertCmd.Flags().IntVarP(&httpserverPort, "port", "P", 8080, "The port to use for the HTTP server")
 	convertCmd.Flags().StringVarP(&httpserverHostname, "hostname", "S", "localhost", "The hostname to use for the HTTP server")
+	convertCmd.Flags().BoolVarP(&noExternalLibs, "no-external-libs", "n", false, "Don't use external libraries for CSS and JS")
 }
