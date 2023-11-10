@@ -7,25 +7,25 @@ Really simple CLI Markdown to HTML converter with styling support
 To convert a Markdown file to HTML, you can run the following command:
 
 ```bash
-mdhtml -f <input file>
+mdhtml convert <input file>
 ```
 
 This will create a file called `output.html` in the current directory. You can also specify the output file name:
 
 ```bash
-mdhtml -f <input file> -o <output file>
+mdhtml convert <input file> -o <output file>
 ```
 
 You can also specify a CSS file to style the HTML file:
 
 ```bash
-mdhtml -f <input file> -o <output file> -s <css file>
+mdhtml convert <input file> -o <output file> -s <css file>
 ```
 
 To see all available options, you can run:
 
 ```bash
-mdhtml -h
+mdhtml --help
 ```
 
 ## 💻 Installation
