@@ -73,9 +73,9 @@ var convertCmd = &cobra.Command{
 		if httpserver {
 			transformArgs.HttpServer = true
 			transform.TransformWatch(transformArgs, httpserver)
+		} else {
+			transform.Transform(transformArgs, true)
 		}
-
-		transform.Transform(transformArgs, true)
 	},
 }
 
