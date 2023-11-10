@@ -13,11 +13,19 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var sourceFile string = ""
+var (
+	sourceFile         string = ""
+	out                string = ""
+	stylesheet         string = ""
+	watch              bool   = false
+	httpserver         bool   = false
+	httpserverPort     int    = 8080
+	httpserverHostname string = "localhost"
+)
 
 // convertCmd represents the convert command
 var convertCmd = &cobra.Command{
-	Use:   "convert [FILE]",
+	Use:   "convert [file]",
 	Short: "Convert a Markdown file to HTML",
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
@@ -39,21 +47,32 @@ var convertCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		// print("sourceFile: ", sourceFile)
-
-		var out string
-
 		if out == "" {
 			split := strings.Split(sourceFile, ".md")
 			out = fmt.Sprintf("%s.html", split[0])
 		}
 
+		if httpserver {
+			watch = true
+		}
+
 		transformArgs := models.Args{
-			File: sourceFile,
-			Out:  out,
+			File:           sourceFile,
+			Style:          stylesheet,
+			NoExternalLibs: false,
+			Watch:          watch,
+			HttpServer:     httpserver,
+			ServerPort:     httpserverPort,
+			ServerHostname: httpserverHostname,
+			Out:            out,
 		}
 
 		// fmt.Println("file flag: ", cmd.Flags().Lookup("file").Value)
+
+		if httpserver {
+			transformArgs.HttpServer = true
+			transform.TransformWatch(transformArgs, httpserver)
+		}
 
 		transform.Transform(transformArgs, true)
 	},
@@ -70,5 +89,10 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	convertCmd.Flags().BoolP("file", "f", false, "Source file")
+	convertCmd.Flags().StringVarP(&out, "output", "o", "", "The destination file to write the HTML to")
+	convertCmd.Flags().StringVarP(&stylesheet, "stylesheet", "s", "", "Apply extra styling to the HTML using a CSS file")
+	convertCmd.Flags().BoolVarP(&watch, "watch", "w", false, "Watch the source file for changes and reconvert when changes are detected")
+	convertCmd.Flags().BoolVarP(&httpserver, "httpserver", "H", false, "Start a HTTP server to serve the HTML file and reload the page when changes are detected")
+	convertCmd.Flags().IntVarP(&httpserverPort, "port", "P", 8080, "The port to use for the HTTP server")
+	convertCmd.Flags().StringVarP(&httpserverHostname, "hostname", "S", "localhost", "The hostname to use for the HTTP server")
 }
