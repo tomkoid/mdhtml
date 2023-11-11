@@ -62,6 +62,7 @@ var convertCmd = &cobra.Command{
 			Style:          stylesheet,
 			NoExternalLibs: noExternalLibs,
 			Watch:          watch,
+			Debug:          debug,
 			HttpServer:     httpserver,
 			ServerPort:     httpserverPort,
 			ServerHostname: httpserverHostname,
