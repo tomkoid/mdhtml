@@ -128,11 +128,13 @@ func TransformWatch(args models.Args, httpServer bool) {
 					httpserver.BroadcastMessage("transforming")
 					Transform(args, false)
 
-					color.Set(color.FgGreen)
-					fmt.Print("==")
-					color.Unset()
+					if args.Debug {
+						color.Set(color.FgGreen)
+						fmt.Print("==")
+						color.Unset()
 
-					fmt.Println(" Successfully transformed to markdown!")
+						fmt.Println(" Successfully transformed to markdown!")
+					}
 
 					httpserver.BroadcastMessage("reload")
 					oldHash = newHash
