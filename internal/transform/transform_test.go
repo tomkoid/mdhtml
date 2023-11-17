@@ -33,7 +33,7 @@ func TestTransform(t *testing.T) {
 	}
 
 	// transform the markdown to HTML
-	transformMarkdownToHTML(args)
+	startTransform(args)
 
 	// check if the HTML file exists
 	if _, err := os.Stat(outFile); os.IsNotExist(err) {
