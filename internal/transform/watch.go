@@ -14,6 +14,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
+// generates the checksum of a file
 func GenerateChecksum(filePath string, oldHash string) string {
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -34,6 +35,7 @@ func GenerateChecksum(filePath string, oldHash string) string {
 	return string(hash.Sum(nil))
 }
 
+// returns checksums of source and style files (if present)
 func GenerateSourceFileChecksum(args models.Args, oldHash string) string {
 	var srcFileChecksum string = ""
 	var styleFileChecksum string = ""
@@ -87,10 +89,12 @@ func TransformWatch(args models.Args, httpServer bool) {
 		os.Exit(1)
 	}
 
+	// if user wants to use the http server, start it in a goroutine
 	if httpServer {
 		go httpserver.HttpServer(args)
 	}
 
+	// list of files that should be watched, this is used to add files to the watcher
 	var watchFiles []string
 	watchFiles = append(watchFiles, args.File)
 
@@ -110,8 +114,10 @@ func TransformWatch(args models.Args, httpServer bool) {
 					continue
 				}
 
-				eventOk := checkEventType(event)
-				if !eventOk {
+				eventGoodType := checkEventType(event)
+
+				if !eventGoodType {
+					// add files back to the watcher
 					err := watcher.Add(event.Name)
 
 					if err != nil {
@@ -124,6 +130,7 @@ func TransformWatch(args models.Args, httpServer bool) {
 
 				newHash := GenerateSourceFileChecksum(args, oldHash)
 
+				// if the hash from previous iteration is not the same as the new hash
 				if oldHash != newHash {
 					httpserver.BroadcastMessage("transforming")
 					Transform(args, false)
@@ -136,6 +143,7 @@ func TransformWatch(args models.Args, httpServer bool) {
 						fmt.Println(" Successfully transformed to markdown!")
 					}
 
+					// broadcast reload message to all connected clients
 					httpserver.BroadcastMessage("reload")
 					oldHash = newHash
 				}
@@ -151,6 +159,7 @@ func TransformWatch(args models.Args, httpServer bool) {
 		}
 	}()
 
+	// add all files in watchFiles to the watcher
 	for _, element := range watchFiles {
 		err = watcher.Add(element)
 		if err != nil {
@@ -159,5 +168,6 @@ func TransformWatch(args models.Args, httpServer bool) {
 		}
 
 	}
+
 	<-done
 }

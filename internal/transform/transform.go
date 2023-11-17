@@ -22,7 +22,7 @@ func Transform(args models.Args, debug bool) {
 	s.Suffix = fmt.Sprintf(" Transforming %s to HTML...", color.BlueString(args.File))
 	s.Start()
 
-	err := transformMarkdownToHTML(args)
+	err := startTransform(args)
 	if !err {
 		s.Stop()
 		log.Fatalf("Error transforming markdown to HTML")
@@ -62,7 +62,7 @@ func Transform(args models.Args, debug bool) {
 	}
 }
 
-func transformMarkdownToHTML(args models.Args) bool {
+func startTransform(args models.Args) bool {
 	content, err := os.ReadFile(args.File)
 	if err != nil {
 		log.Fatalf("Error reading file: %s", err)
@@ -112,6 +112,7 @@ func transformMarkdownToHTML(args models.Args) bool {
 	return true
 }
 
+// this actually converts markdown to HTML
 func mdToHTML(md []byte) []byte {
 	// create markdown parser with extensions
 	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock
