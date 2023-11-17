@@ -11,12 +11,12 @@ console.log("Hello World");
 - [x] done
 - [ ] undone
 
-Name    | Age
---------|------
-Bob     ||
-Alice   | 23
+Name    | Age |
+--------|-----|
+Bob     | 10  |
+Alice   | 23  |
 ========|======
-Total   | 23
+Total   | 33  | 
 
 ---
 
