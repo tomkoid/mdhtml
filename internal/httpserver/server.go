@@ -19,7 +19,7 @@ var reloadData, reloadDataErr = f.ReadFile("assets/reload.js")
 var prismJSData, prismJSErr = f.ReadFile("assets/prism.js")
 var prismCSSData, prismCSSErr = f.ReadFile("assets/prism.css")
 
-var History = []BroadcastData{}
+var BroadcastHistory = []BroadcastData{}
 
 // this is done because every data that is appended to History must be somewhat unique
 var broadcastIndex = 0
@@ -30,7 +30,7 @@ type BroadcastData struct {
 }
 
 func BroadcastMessage(data string) {
-	History = append(History, BroadcastData{
+	BroadcastHistory = append(BroadcastHistory, BroadcastData{
 		Index: broadcastIndex,
 		Data:  data,
 	})

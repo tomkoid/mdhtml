@@ -43,10 +43,10 @@ func WSEndpoint(c echo.Context) error {
 
 		defer ws.Close()
 
-		localHistory := History
+		localBroadcastHistory := BroadcastHistory
 
 		for {
-			var diff []string = difference(History, localHistory)
+			var diff []string = difference(BroadcastHistory, localBroadcastHistory)
 
 			if len(diff) == 0 {
 				time.Sleep(50 * time.Millisecond)
@@ -65,12 +65,12 @@ func WSEndpoint(c echo.Context) error {
 						log.Printf("> Error sending message to %s using websocket to reload client: %s\n", c.Request().RemoteAddr, err)
 					}
 
-					localHistory = History
+					localBroadcastHistory = BroadcastHistory
 					break
 				}
 			}
 
-			localHistory = History
+			localBroadcastHistory = BroadcastHistory
 		}
 	}))}.ServeHTTP(c.Response(), c.Request())
 
