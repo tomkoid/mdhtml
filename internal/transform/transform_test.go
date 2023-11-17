@@ -47,8 +47,7 @@ func TestTransform(t *testing.T) {
 	}
 
 	// remove all whitespaces and newlines from the HTML
-	html := strings.ReplaceAll(string(content), " ", "")
-	html = strings.ReplaceAll(html, "\n", "")
+	html := strings.ReplaceAll(strings.ReplaceAll(string(content), " ", ""), "\n", "")
 
 	t.Logf("HTML: %s", html)
 	// check if the HTML contains the markdown
