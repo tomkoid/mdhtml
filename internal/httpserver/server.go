@@ -35,12 +35,14 @@ func BroadcastMessage(data string) {
 		Index: broadcastIndex,
 		Data:  data,
 	})
+
 	broadcastIndex++
 }
 
 func HttpServer(args models.Args) {
 	app := echo.New()
 	app.HideBanner = true
+	app.HidePort = true
 	app.Use(middleware.Recover())
 	app.Use(middleware.CORS())
 
@@ -58,6 +60,9 @@ func HttpServer(args models.Args) {
 	router := app.Group("") // root group
 
 	setupRoutes(router, args)
+
+	// this is in a goroutine because of the error handling (see ./info.go)
+	go printServerInfo(args)
 
 	app.Logger.Fatal(app.Start(fmt.Sprintf("%s:%d", args.ServerHostname, args.ServerPort)))
 }

@@ -22,6 +22,7 @@ var (
 	httpserverPort     int    = 8080
 	httpserverHostname string = "localhost"
 	noExternalLibs     bool   = false
+	noServerHeaderWait bool   = false
 )
 
 // convertCmd represents the convert command
@@ -58,15 +59,16 @@ var convertCmd = &cobra.Command{
 		}
 
 		transformArgs := models.Args{
-			File:           sourceFile,
-			Style:          stylesheet,
-			NoExternalLibs: noExternalLibs,
-			Watch:          watch,
-			Debug:          debug,
-			HttpServer:     httpserver,
-			ServerPort:     httpserverPort,
-			ServerHostname: httpserverHostname,
-			Out:            out,
+			File:               sourceFile,
+			Style:              stylesheet,
+			NoExternalLibs:     noExternalLibs,
+			NoServerHeaderWait: noServerHeaderWait,
+			Watch:              watch,
+			Debug:              debug,
+			HttpServer:         httpserver,
+			ServerPort:         httpserverPort,
+			ServerHostname:     httpserverHostname,
+			Out:                out,
 		}
 
 		// fmt.Println("file flag: ", cmd.Flags().Lookup("file").Value)
@@ -98,4 +100,5 @@ func init() {
 	convertCmd.Flags().IntVarP(&httpserverPort, "port", "P", 8080, "The port to use for the HTTP server")
 	convertCmd.Flags().StringVarP(&httpserverHostname, "hostname", "S", "localhost", "The hostname to use for the HTTP server")
 	convertCmd.Flags().BoolVarP(&noExternalLibs, "no-external-libs", "n", false, "Don't use external libraries for CSS and JS")
+	convertCmd.Flags().BoolVar(&noServerHeaderWait, "no-server-header-wait", false, "Print server connection message before checking if server is actually running")
 }
