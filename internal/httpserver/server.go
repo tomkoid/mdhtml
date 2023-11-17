@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"codeberg.org/Tomkoid/mdhtml/internal/models"
+	"github.com/fatih/color"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -45,7 +46,11 @@ func HttpServer(args models.Args) {
 
 	if args.Debug {
 		app.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-			Format: "${method}: ${uri}, status=${status}\n",
+			Format: (func() string {
+				prefix := color.New(color.FgGreen)
+
+				return fmt.Sprintf("%s: ${uri}\n", prefix.Sprintf("${method} ${status}"))
+			})(),
 		}))
 	}
 
