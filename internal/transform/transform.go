@@ -59,6 +59,10 @@ func Transform(args models.Args, debug bool) {
 		color.Unset()
 
 		fmt.Printf("file://%s\n", destPath)
+
+		if args.Open {
+			utils.OpenInBrowser(destPath)
+		}
 	}
 }
 

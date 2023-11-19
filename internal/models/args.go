@@ -6,6 +6,7 @@ type Args struct {
 	Style              string
 	Watch              bool
 	HttpServer         bool
+	Open               bool
 	Debug              bool
 	ServerPort         int
 	ServerHostname     string

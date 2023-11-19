@@ -92,6 +92,10 @@ func TransformWatch(args models.Args, httpServer bool) {
 	// if user wants to use the http server, start it in a goroutine
 	if httpServer {
 		go httpserver.HttpServer(args)
+
+		if args.Open {
+			utils.OpenInBrowser(fmt.Sprintf("http://%s:%d", args.ServerHostname, args.ServerPort))
+		}
 	}
 
 	// list of files that should be watched, this is used to add files to the watcher

@@ -23,6 +23,7 @@ var (
 	httpserverHostname string = "localhost"
 	noExternalLibs     bool   = false
 	noServerHeaderWait bool   = false
+	open               bool   = false
 )
 
 // convertCmd represents the convert command
@@ -66,6 +67,7 @@ var convertCmd = &cobra.Command{
 			Watch:              watch,
 			Debug:              debug,
 			HttpServer:         httpserver,
+			Open:               open,
 			ServerPort:         httpserverPort,
 			ServerHostname:     httpserverHostname,
 			Out:                out,
@@ -97,6 +99,7 @@ func init() {
 	convertCmd.Flags().StringVarP(&stylesheet, "stylesheet", "s", "", "Apply extra styling to the HTML using a CSS file")
 	convertCmd.Flags().BoolVarP(&watch, "watch", "w", false, "Watch the source file for changes and reconvert when changes are detected")
 	convertCmd.Flags().BoolVarP(&httpserver, "httpserver", "H", false, "Start a HTTP server to serve the HTML file and reload the page when changes are detected")
+	convertCmd.Flags().BoolVarP(&open, "open", "O", false, "Open HTML file or HTTP server in browser")
 	convertCmd.Flags().IntVarP(&httpserverPort, "port", "P", 8080, "The port to use for the HTTP server")
 	convertCmd.Flags().StringVarP(&httpserverHostname, "hostname", "S", "localhost", "The hostname to use for the HTTP server")
 	convertCmd.Flags().BoolVarP(&noExternalLibs, "no-external-libs", "n", false, "Don't use external libraries for CSS and JS")
