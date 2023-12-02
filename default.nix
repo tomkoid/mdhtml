@@ -2,7 +2,7 @@
 
 pkgs.buildGoModule {
   pname = "mdhtml";
-  version = "0.3.1";
+  version = "1.0";
   src = ./.;
 
   vendorHash = null;
