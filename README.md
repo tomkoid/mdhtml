@@ -48,6 +48,8 @@ mdhtml --help
 
 ## 💻 Installation
 
+mdhtml is currently packaged only for Arch Linux and nixpkgs. You can find the packages here:
+
 [![Packaging status](https://repology.org/badge/vertical-allrepos/mdhtml.svg)](https://repology.org/project/mdhtml/versions)
 
 To install mdhtml, you can either download the binary from the [releases page](https://codeberg.org/Tomkoid/mdhtml/releases) and install it to the system or build it from source.
