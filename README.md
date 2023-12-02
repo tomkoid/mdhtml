@@ -52,6 +52,10 @@ mdhtml is currently packaged only for Arch Linux and nixpkgs. You can find the p
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/mdhtml.svg)](https://repology.org/project/mdhtml/versions)
 
+**NOTE:** The version of mdhtml in the nixpkgs repository is on 0.3.0, which is an old version. This version has some bugs and problem with high CPU usage on watch mode. You probably want to use the latest version. 
+
+For NixOS users, I recommend using the nixpkgs-unstable channel, which should have the latest version of mdhtml soon. Or you can install mdhtml through a Nix flake.
+
 To install mdhtml, you can either download the binary from the [releases page](https://codeberg.org/Tomkoid/mdhtml/releases) and install it to the system or build it from source.
 
 ### Installing the binary
@@ -79,3 +83,35 @@ sudo mv mdhtml /usr/local/bin
 ### Installing from AUR
 
 If you are using Arch Linux, you can install mdhtml from the [AUR](https://aur.archlinux.org/packages/mdhtml/).
+
+### Installing from a Nix flake
+
+If you are using Nix, you can install mdhtml from a Nix flake. To do this, you need to have [Nix](https://nixos.org/download.html) installed on your system. Then you can add the mdhtml input to your configuration and install it:
+
+```nix
+# flake.nix
+
+{
+  inputs.mdhtml.url = "git+https://codeberg.org/Tomkoid/mdhtml";
+  # ...
+
+  outputs = {nixpkgs, ...} @ inputs: {
+    nixosConfigurations.HOSTNAME = nixpkgs.lib.nixosSystem {
+      specialArgs = { inherit inputs; }; # this is the important part
+      modules = [
+        ./configuration.nix
+      ];
+    };
+  } 
+}
+
+# configuration.nix
+
+{inputs, pkgs, ...}: {
+  # ...
+  environment.systemPackages = [
+    inputs.mdhtml.defaultPackage.${system}
+  ];
+  # ...
+}
+``` 
