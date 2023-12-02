@@ -66,11 +66,12 @@ func checkEventType(event fsnotify.Event) bool {
 }
 
 func TransformWatch(args models.Args, httpServer bool) {
-	// check if the out file exists
-	if _, err := os.Stat(args.Out); os.IsNotExist(err) || args.Debug {
+	if args.Debug {
 		fmt.Println("Transforming...")
-		Transform(args, false)
 	}
+
+	// transform the markdown file
+	Transform(args, false)
 
 	// use fsnotify to watch for changes
 	watcher, err := fsnotify.NewWatcher()
