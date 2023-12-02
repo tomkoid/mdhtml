@@ -2,6 +2,10 @@
 
 Really simple CLI Markdown to HTML converter with styling support
 
+## Showcase
+
+[![asciicast](https://asciinema.org/a/624645.svg)](https://asciinema.org/a/624645)
+
 ## 🌟 Usage
 
 To convert a Markdown file to HTML, you can run the following command:
