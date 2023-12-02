@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"codeberg.org/Tomkoid/mdhtml/internal/models"
+	"github.com/fatih/color"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -19,7 +20,7 @@ var reloadData, reloadDataErr = f.ReadFile("assets/reload.js")
 var prismJSData, prismJSErr = f.ReadFile("assets/prism.js")
 var prismCSSData, prismCSSErr = f.ReadFile("assets/prism.css")
 
-var History = []BroadcastData{}
+var BroadcastHistory = []BroadcastData{}
 
 // this is done because every data that is appended to History must be somewhat unique
 var broadcastIndex = 0
@@ -30,22 +31,28 @@ type BroadcastData struct {
 }
 
 func BroadcastMessage(data string) {
-	History = append(History, BroadcastData{
+	BroadcastHistory = append(BroadcastHistory, BroadcastData{
 		Index: broadcastIndex,
 		Data:  data,
 	})
+
 	broadcastIndex++
 }
 
 func HttpServer(args models.Args) {
 	app := echo.New()
 	app.HideBanner = true
+	app.HidePort = true
 	app.Use(middleware.Recover())
 	app.Use(middleware.CORS())
 
 	if args.Debug {
 		app.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-			Format: "${method}: ${uri}, status=${status}\n",
+			Format: (func() string {
+				prefix := color.New(color.FgGreen)
+
+				return fmt.Sprintf("%s: ${uri}\n", prefix.Sprintf("${method} ${status}"))
+			})(),
 		}))
 	}
 
@@ -53,6 +60,9 @@ func HttpServer(args models.Args) {
 	router := app.Group("") // root group
 
 	setupRoutes(router, args)
+
+	// this is in a goroutine because of the error handling (see ./info.go)
+	go printServerInfo(args)
 
 	app.Logger.Fatal(app.Start(fmt.Sprintf("%s:%d", args.ServerHostname, args.ServerPort)))
 }

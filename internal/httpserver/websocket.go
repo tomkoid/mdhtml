@@ -35,18 +35,21 @@ func WSEndpoint(c echo.Context) error {
 	}
 
 	websocket.Server{Handler: websocket.Handler(websocket.Handler(func(ws *websocket.Conn) {
+		// send hello packet
 		websocket.Message.Send(ws, "hello")
 
 		if args.Debug {
 			fmt.Println("> Client connected")
 		}
 
+		// close connection on exit
 		defer ws.Close()
 
-		localHistory := History
+		// create local broadcast history, used to compare with global broadcast history
+		localBroadcastHistory := BroadcastHistory
 
 		for {
-			var diff []string = difference(History, localHistory)
+			var diff []string = difference(BroadcastHistory, localBroadcastHistory)
 
 			if len(diff) == 0 {
 				time.Sleep(50 * time.Millisecond)
@@ -57,6 +60,7 @@ func WSEndpoint(c echo.Context) error {
 				fmt.Printf("> Sending message to %s using websocket to reload client...\n", c.Request().RemoteAddr)
 			}
 
+			// send all messages in diff
 			for _, value := range diff {
 				err := websocket.Message.Send(ws, value)
 
@@ -65,12 +69,13 @@ func WSEndpoint(c echo.Context) error {
 						log.Printf("> Error sending message to %s using websocket to reload client: %s\n", c.Request().RemoteAddr, err)
 					}
 
-					localHistory = History
+					// reset local broadcast history
+					localBroadcastHistory = BroadcastHistory
 					break
 				}
 			}
 
-			localHistory = History
+			localBroadcastHistory = BroadcastHistory
 		}
 	}))}.ServeHTTP(c.Response(), c.Request())
 

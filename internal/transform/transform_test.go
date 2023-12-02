@@ -33,7 +33,7 @@ func TestTransform(t *testing.T) {
 	}
 
 	// transform the markdown to HTML
-	transformMarkdownToHTML(args)
+	startTransform(args)
 
 	// check if the HTML file exists
 	if _, err := os.Stat(outFile); os.IsNotExist(err) {
@@ -47,17 +47,16 @@ func TestTransform(t *testing.T) {
 	}
 
 	// remove all whitespaces and newlines from the HTML
-	html := strings.ReplaceAll(string(content), " ", "")
-	html = strings.ReplaceAll(html, "\n", "")
+	html := strings.ReplaceAll(strings.ReplaceAll(string(content), " ", ""), "\n", "")
 
 	t.Logf("HTML: %s", html)
 	// check if the HTML contains the markdown
-	if !strings.Contains(html, "<h1>Test</h1>") {
+	if !strings.Contains(html, `<h1id="test">Test</h1>`) {
 		t.Errorf("Error: HTML does not contain markdown")
 	}
 
 	// if HTML is the same
-	if html != `<h1>Test</h1><style>body{background-color:red;}</style><linkrel="stylesheet"href="/default.css"><scriptsrc="/reload.js"defer></script>` {
+	if html != `<h1id="test">Test</h1><style>body{background-color:red;}</style><metaname="viewport"content="width=device-width,initial-scale=1"><linkrel="stylesheet"href="/default.css"><scriptsrc="/reload.js"defer></script>` {
 		t.Errorf("Error: HTML is not the same as expected: %s", html)
 	}
 

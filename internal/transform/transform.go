@@ -12,6 +12,8 @@ import (
 	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
 	"github.com/gomarkdown/markdown"
+	"github.com/gomarkdown/markdown/html"
+	"github.com/gomarkdown/markdown/parser"
 )
 
 func Transform(args models.Args, debug bool) {
@@ -20,7 +22,7 @@ func Transform(args models.Args, debug bool) {
 	s.Suffix = fmt.Sprintf(" Transforming %s to HTML...", color.BlueString(args.File))
 	s.Start()
 
-	err := transformMarkdownToHTML(args)
+	err := startTransform(args)
 	if !err {
 		s.Stop()
 		log.Fatalf("Error transforming markdown to HTML")
@@ -57,17 +59,21 @@ func Transform(args models.Args, debug bool) {
 		color.Unset()
 
 		fmt.Printf("file://%s\n", destPath)
+
+		if args.Open {
+			utils.OpenInBrowser(destPath)
+		}
 	}
 }
 
-func transformMarkdownToHTML(args models.Args) bool {
+func startTransform(args models.Args) bool {
 	content, err := os.ReadFile(args.File)
 	if err != nil {
 		log.Fatalf("Error reading file: %s", err)
 		os.Exit(1)
 	}
 
-	html := markdown.ToHTML(content, nil, nil)
+	html := mdToHTML(content)
 
 	prismData := `
     <script src="/prism.js" defer></script>
@@ -80,6 +86,7 @@ func transformMarkdownToHTML(args models.Args) bool {
 	}
 
 	headData := `
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="stylesheet" href="/default.css">
     <script src="/reload.js" defer></script>
   ` + prismData
@@ -107,4 +114,19 @@ func transformMarkdownToHTML(args models.Args) bool {
 	}
 
 	return true
+}
+
+// this actually converts markdown to HTML
+func mdToHTML(md []byte) []byte {
+	// create markdown parser with extensions
+	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock
+	p := parser.NewWithExtensions(extensions)
+	doc := p.Parse(md)
+
+	// create HTML renderer with extensions
+	htmlFlags := html.CommonFlags | html.HrefTargetBlank | html.LazyLoadImages
+	opts := html.RendererOptions{Flags: htmlFlags}
+	renderer := html.NewRenderer(opts)
+
+	return markdown.Render(doc, renderer)
 }

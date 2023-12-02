@@ -7,6 +7,11 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+func staticFile(c echo.Context, contentType string, data string) error {
+	c.Response().Header().Set("Content-Type", contentType)
+	return c.String(http.StatusOK, string(data))
+}
+
 func setupRoutes(app *echo.Group, args models.Args) {
 	// MIDDLEWARE: pass args to every route
 	app.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -22,24 +27,10 @@ func setupRoutes(app *echo.Group, args models.Args) {
 	app.Any("/ws", WSEndpoint)
 
 	/// assets
-	app.GET("/default.css", func(c echo.Context) error {
-		c.Response().Header().Set("Content-Type", "application/css")
-		return c.String(http.StatusOK, string(defaultCSSData))
-	})
-
-	app.GET("/reload.js", func(c echo.Context) error {
-		c.Response().Header().Set("Content-Type", "application/javascript")
-		return c.String(http.StatusOK, string(reloadData))
-	})
+	app.GET("/default.css", func(c echo.Context) error { return staticFile(c, "application/css", string(defaultCSSData)) })
+	app.GET("/reload.js", func(c echo.Context) error { return staticFile(c, "application/javascript", string(reloadData)) })
 
 	// syntax highlighting
-	app.GET("/prism.js", func(c echo.Context) error {
-		c.Response().Header().Set("Content-Type", "application/javascript")
-		return c.String(http.StatusOK, string(prismJSData))
-	})
-
-	app.GET("/prism.css", func(c echo.Context) error {
-		c.Response().Header().Set("Content-Type", "application/css")
-		return c.String(http.StatusOK, string(prismCSSData))
-	})
+	app.GET("/prism.js", func(c echo.Context) error { return staticFile(c, "application/javascript", string(prismJSData)) })
+	app.GET("/prism.css", func(c echo.Context) error { return staticFile(c, "application/css", string(prismCSSData)) })
 }

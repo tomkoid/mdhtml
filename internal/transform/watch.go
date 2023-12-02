@@ -14,6 +14,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
+// generates the checksum of a file
 func GenerateChecksum(filePath string, oldHash string) string {
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -34,6 +35,7 @@ func GenerateChecksum(filePath string, oldHash string) string {
 	return string(hash.Sum(nil))
 }
 
+// returns checksums of source and style files (if present)
 func GenerateSourceFileChecksum(args models.Args, oldHash string) string {
 	var srcFileChecksum string = ""
 	var styleFileChecksum string = ""
@@ -63,11 +65,13 @@ func checkEventType(event fsnotify.Event) bool {
 	return true
 }
 
-func TransformWatch(args models.Args, debug bool, httpServer bool) {
-	// check if the out file exists
-	if _, err := os.Stat(args.Out); os.IsNotExist(err) {
-		Transform(args, debug)
+func TransformWatch(args models.Args, httpServer bool) {
+	if args.Debug {
+		fmt.Println("Transforming...")
 	}
+
+	// transform the markdown file
+	Transform(args, false)
 
 	// use fsnotify to watch for changes
 	watcher, err := fsnotify.NewWatcher()
@@ -86,12 +90,16 @@ func TransformWatch(args models.Args, debug bool, httpServer bool) {
 		os.Exit(1)
 	}
 
+	// if user wants to use the http server, start it in a goroutine
 	if httpServer {
-		go func() {
-			httpserver.HttpServer(args)
-		}()
+		go httpserver.HttpServer(args)
+
+		if args.Open {
+			utils.OpenInBrowser(fmt.Sprintf("http://%s:%d", args.ServerHostname, args.ServerPort))
+		}
 	}
 
+	// list of files that should be watched, this is used to add files to the watcher
 	var watchFiles []string
 	watchFiles = append(watchFiles, args.File)
 
@@ -111,8 +119,10 @@ func TransformWatch(args models.Args, debug bool, httpServer bool) {
 					continue
 				}
 
-				eventOk := checkEventType(event)
-				if !eventOk {
+				eventGoodType := checkEventType(event)
+
+				if !eventGoodType {
+					// add files back to the watcher
 					err := watcher.Add(event.Name)
 
 					if err != nil {
@@ -125,16 +135,20 @@ func TransformWatch(args models.Args, debug bool, httpServer bool) {
 
 				newHash := GenerateSourceFileChecksum(args, oldHash)
 
+				// if the hash from previous iteration is not the same as the new hash
 				if oldHash != newHash {
 					httpserver.BroadcastMessage("transforming")
 					Transform(args, false)
 
-					color.Set(color.FgGreen)
-					fmt.Print("==")
-					color.Unset()
+					if args.Debug {
+						color.Set(color.FgGreen)
+						fmt.Print("==")
+						color.Unset()
 
-					fmt.Println(" Successfully transformed to markdown!")
+						fmt.Println(" Successfully transformed to markdown!")
+					}
 
+					// broadcast reload message to all connected clients
 					httpserver.BroadcastMessage("reload")
 					oldHash = newHash
 				}
@@ -150,6 +164,7 @@ func TransformWatch(args models.Args, debug bool, httpServer bool) {
 		}
 	}()
 
+	// add all files in watchFiles to the watcher
 	for _, element := range watchFiles {
 		err = watcher.Add(element)
 		if err != nil {
@@ -158,5 +173,6 @@ func TransformWatch(args models.Args, debug bool, httpServer bool) {
 		}
 
 	}
+
 	<-done
 }

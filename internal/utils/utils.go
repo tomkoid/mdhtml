@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 )
 
@@ -31,4 +32,9 @@ func ShaString(s string) string {
 	h := sha1.New()
 	h.Write([]byte(s))
 	return hex.EncodeToString(h.Sum(nil))
+}
+
+func OpenInBrowser(path string) {
+	cmd := exec.Command("xdg-open", path)
+	cmd.Run()
 }
