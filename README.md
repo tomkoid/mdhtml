@@ -13,14 +13,28 @@ mdhtml convert <input file>
 This will create a file called `output.html` in the current directory. You can also specify the output file name:
 
 ```bash
-mdhtml convert <input file> -o <output file>
+mdhtml convert <input file> --output <output file>
 ```
 
 You can also specify a CSS file to style the HTML file:
 
 ```bash
-mdhtml convert <input file> -o <output file> -s <css file>
+mdhtml convert <input file> --output <output file> --stylesheet <css file>
 ```
+
+MDHTML also supports watching a file for changes and automatically updating the output file:
+
+```bash
+mdhtml convert <input file> --watch
+```
+
+If you want, you can also enable an HTTP server with live reloading:
+
+```bash
+mdhtml convert <input file> --watch --httpserver
+```
+
+
 
 To see all available options, you can run:
 
