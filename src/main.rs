@@ -21,7 +21,7 @@ async fn main() {
             if args.raw && args.style.is_some() {
                 eprintln!("Error: --raw and --style are mutually exclusive.");
                 eprintln!("Please choose one or the other.");
-                exit(1);
+                exit(1)
             }
 
             // if raw and no_external_libs is set, exit

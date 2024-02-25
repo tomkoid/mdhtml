@@ -4,6 +4,7 @@ internal/transform/*.html
 examples/*.css
 # Really big example file
 examples/mastodon-long.md
+/*.html
 
 # Binaries
 /mdhtml

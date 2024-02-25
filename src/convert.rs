@@ -1,4 +1,8 @@
-use std::{path::PathBuf, process::exit};
+use std::{
+    path::PathBuf,
+    process::exit,
+    sync::{Arc, Mutex},
+};
 
 use pulldown_cmark::Parser;
 use spinners::Spinner;
@@ -8,6 +12,38 @@ use crate::{
     tools::get_filename,
     SPINNER_TYPE,
 };
+
+struct SpinnerState {
+    pub stop: bool, // stop signal, stop the spinner if true
+}
+
+fn spinner_handler(spinner_state: Arc<Mutex<SpinnerState>>) {
+    // sleep before starting
+    let now = std::time::Instant::now();
+
+    loop {
+        if spinner_state.lock().unwrap().stop {
+            return;
+        }
+
+        if now.elapsed().as_millis() > 200 {
+            break;
+        }
+
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
+
+    let mut spinner = Spinner::new(SPINNER_TYPE, "Converting input to markdown...".into());
+
+    loop {
+        if spinner_state.lock().unwrap().stop {
+            spinner.stop_with_message(format!("Done! Took {}ms.", now.elapsed().as_millis()));
+            return;
+        }
+
+        std::thread::sleep(std::time::Duration::from_millis(100));
+    }
+}
 
 pub fn convert(args: &super::args::Convert, debug: bool, state: Option<AppState>) {
     // config
@@ -29,14 +65,17 @@ pub fn convert(args: &super::args::Convert, debug: bool, state: Option<AppState>
         Messages::send_transforming_async(axum::extract::State(state.unwrap()));
     }
 
-    let mut sp = Spinner::new(SPINNER_TYPE, "Converting input to markdown...".into());
+    let spinner_state = Arc::new(Mutex::new(SpinnerState { stop: false }));
+
+    let moved_spinner_state = Arc::clone(&spinner_state.clone());
+    let spinner_handler_thread = std::thread::spawn(move || spinner_handler(moved_spinner_state));
 
     let html_output = convert_html_to_markdown(&args.input.to_string());
 
     let html = if let Ok(html) = html_output {
         html
     } else {
-        sp.stop_with_message("Error converting input to markdown!".into());
+        // sp.stop_with_message("Error converting input to markdown!".into());
 
         let error: String;
 
@@ -74,7 +113,9 @@ pub fn convert(args: &super::args::Convert, debug: bool, state: Option<AppState>
         exit(1);
     };
 
-    sp.stop_with_message("".into());
+    spinner_state.lock().unwrap().stop = true;
+
+    spinner_handler_thread.join().unwrap();
 
     // read the reload script file
     let reload_script = if server_arg {
