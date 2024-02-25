@@ -9,6 +9,7 @@ examples/mastodon-long.md
 /mdhtml
 /main
 /target
+/result
 
 # Build scripts and build files
 /tmp
