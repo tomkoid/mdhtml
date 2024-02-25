@@ -1,0 +1,17 @@
+[package]
+name = "mdhtml"
+version = "2.0.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.79"
+axum = { version = "0.7.3", features = ["ws"] }
+clap = { version = "4.4.12", features = ["derive"] }
+notify = "6.1.1"
+pulldown-cmark = "0.9.3"
+sha2 = "0.10.8"
+spinners = "4.1.1"
+tokio = { version = "1.35.1", features = ["macros", "rt-multi-thread"] }
+tokio-tungstenite = "0.21.0"

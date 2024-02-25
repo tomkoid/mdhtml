@@ -2,10 +2,13 @@
 examples/*.html
 internal/transform/*.html
 examples/*.css
+# Really big example file
+examples/mastodon-long.md
 
 # Binaries
 /mdhtml
 /main
+/target
 
 # Build scripts and build files
 /tmp
