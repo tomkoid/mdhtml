@@ -1,6 +1,6 @@
 steps:
   mdhtml:
-    image: golang
+    image: rust 
     commands:
-      - go build
-      - go test ./...
+      - cargo check 
+      - cargo test
