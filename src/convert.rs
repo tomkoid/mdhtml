@@ -135,6 +135,12 @@ pub fn convert(
         ""
     };
 
+    let scripts = if !args.no_external_libs {
+        format!("{}", include_str!("scripts/highlightjs.html"))
+    } else {
+        "".to_string()
+    };
+
     // styling
     let html = if style_arg.is_some() && !raw_arg {
         let style = std::fs::read_to_string(style_arg.clone().unwrap());
@@ -153,16 +159,16 @@ pub fn convert(
         let style = style.unwrap();
 
         format!(
-            "<html><head><style>\n{}</style><script>\n{}</script></head><body>\n{}</body></html>",
-            style, reload_script, html
+            "<html><head><style>\n{}</style><script>\n{}</script>\n{}</head><body>\n{}</body></html>",
+            style, reload_script, scripts, html
         )
     } else {
         if raw_arg {
             html
         } else {
             format!(
-                "<html><head><script>{}</script></head><body>{}</body></html>",
-                reload_script, html
+                "<html><head><script>{}</script>\n{}</head><body>{}</body></html>",
+                reload_script, scripts, html
             )
         }
     };
