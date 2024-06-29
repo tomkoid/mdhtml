@@ -36,7 +36,7 @@ async fn main() {
                 let mut handle: Option<std::thread::JoinHandle<()>> = None;
     
                 if args.open {
-                    handle = Some(xdg_open_in_app("http://0.0.0.0:3000".to_string()));
+                    handle = Some(xdg_open_in_app(format!("http://{}:{}", args.hostname, args.port)));
                 }
 
                 http::server::start_server(&args).await;

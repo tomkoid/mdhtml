@@ -38,9 +38,18 @@ pub struct Convert {
     #[clap(short = 'O', long, default_value_t = false)]
     pub open: bool,
 
+
     /// Start a HTTP server to serve the HTML file and reload the page when changes are detected
     #[clap(long)]
     pub server: bool,
+
+    /// Hostname of the HTTP server
+    #[clap(long, default_value = "127.0.0.1")]
+    pub hostname: String,
+
+    /// Port of the HTTP server
+    #[clap(long, default_value_t = 3000)]
+    pub port: i32,
 
     /// Prints additional debug info 
     #[clap(long)]
