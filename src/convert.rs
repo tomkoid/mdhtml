@@ -194,14 +194,7 @@ pub fn convert(args: &super::args::Convert, debug: bool, state: Option<AppState>
 }
 
 fn convert_html_to_markdown(input_file: &String) -> Result<String, std::io::Error> {
-    let markdown_input = std::fs::read_to_string(&input_file);
-
-    let markdown_input = match markdown_input {
-        Ok(_) => markdown_input.unwrap(),
-        Err(e) => {
-            return Err(e);
-        }
-    };
+    let markdown_input = std::fs::read_to_string(&input_file)?;
 
     let mut options = pulldown_cmark::Options::empty();
     options.insert(pulldown_cmark::Options::ENABLE_TABLES);
