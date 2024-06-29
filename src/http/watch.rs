@@ -8,8 +8,6 @@ use sha2::Digest;
 
 use super::server::AppState;
 
-const MAX_ERROR_COUNT: usize = 5;
-
 pub fn watch(args: &Convert, State(state): State<AppState>) -> anyhow::Result<()> {
     println!("Watching for changes... Press Ctrl+C to exit.");
 
@@ -20,14 +18,7 @@ pub fn watch(args: &Convert, State(state): State<AppState>) -> anyhow::Result<()
     let mut init_hash = String::from("something very random");
 
     // some error handling
-    let mut error_count = 0;
-    let mut stop_loop = false;
-
     loop {
-        if stop_loop {
-            break;
-        }
-
         let file_hash = match file_data_hash(&args.input) {
             Ok(hash) => hash,
             Err(e) => {
@@ -37,12 +28,6 @@ pub fn watch(args: &Convert, State(state): State<AppState>) -> anyhow::Result<()
 
                 // sleep for a while
                 std::thread::sleep(Duration::from_millis(20));
-
-                if error_count >= MAX_ERROR_COUNT {
-                    stop_loop = true;
-                }
-
-                error_count += 1;
 
                 continue;
             }
@@ -57,8 +42,6 @@ pub fn watch(args: &Convert, State(state): State<AppState>) -> anyhow::Result<()
             init_hash = file_hash;
         }
     }
-
-    Ok(())
 }
 
 fn file_data_hash(filename: &str) -> anyhow::Result<String> {
