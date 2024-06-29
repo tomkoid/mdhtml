@@ -3,6 +3,7 @@ use std::process::exit;
 use clap::CommandFactory;
 use clap::Parser;
 use spinners::Spinners;
+use tools::xdg_open_in_app;
 
 const SPINNER_TYPE: Spinners = Spinners::Dots6;
 
@@ -32,10 +33,26 @@ async fn main() {
             }
 
             if args.server {
+                let mut handle: Option<std::thread::JoinHandle<()>> = None;
+    
+                if args.open {
+                    handle = Some(xdg_open_in_app("http://0.0.0.0:3000".to_string()));
+                }
+
                 http::server::start_server(&args).await;
+
+                if args.open && handle.is_some() {
+                    handle.unwrap().join().unwrap()
+                }
             }
 
-            convert::convert(&args, true, None);
+            let resp = convert::convert(&args, true, None);
+            if args.open {
+                if resp.convert_output.is_some() {
+                    let handle = xdg_open_in_app(resp.convert_output.unwrap());
+                    handle.join().unwrap();
+                }
+            }
         }
 
         None => {

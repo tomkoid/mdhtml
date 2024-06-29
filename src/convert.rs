@@ -48,7 +48,15 @@ fn spinner_handler(spinner_state: Arc<Mutex<SpinnerState>>) {
     }
 }
 
-pub fn convert(args: &super::args::Convert, debug: bool, state: Option<AppState>) {
+pub struct ConvertResponse {
+    pub convert_output: Option<String>,
+}
+
+pub fn convert(
+    args: &super::args::Convert,
+    debug: bool,
+    state: Option<AppState>,
+) -> ConvertResponse {
     // config
     let raw_arg = args.raw;
     let style_arg = args.style.clone();
@@ -174,22 +182,39 @@ pub fn convert(args: &super::args::Convert, debug: bool, state: Option<AppState>
     }
 
     if debug {
-        println!("{} Successfully wrote to output file {}.", "==".green().bold(), true_output_file);
+        println!(
+            "{} Successfully wrote to output file {}.",
+            "==".green().bold(),
+            true_output_file
+        );
+
+        let output_path = PathBuf::from(true_output_file)
+            .canonicalize()
+            .unwrap()
+            .display()
+            .to_string();
 
         println!(
             "{SPACING}View in browser at {}{}.",
             "file://".blue(),
-            PathBuf::from(true_output_file)
-                .canonicalize()
-                .unwrap()
-                .display()
-                .to_string()
+                output_path
                 .blue()
         );
 
         if style_arg.is_some() {
-            println!("{SPACING}Used style file {}", style_arg.clone().unwrap().blue());
+            println!(
+                "{SPACING}Used style file {}",
+                style_arg.clone().unwrap().blue()
+            );
         }
+
+        return ConvertResponse {
+            convert_output: Some(output_path)
+        };
+    }
+
+    ConvertResponse {
+        convert_output: None
     }
 }
 

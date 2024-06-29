@@ -1,4 +1,8 @@
-use std::path::Path;
+use std::{
+    path::Path,
+    process::{Command, Stdio},
+    thread,
+};
 
 use crate::args::Convert;
 
@@ -38,4 +42,28 @@ pub fn get_filename(args: &Convert) -> String {
     }
 
     true_output_file
+}
+
+pub fn xdg_open_in_app(url: String) -> std::thread::JoinHandle<()> {
+    thread::spawn(move || {
+        let command = Command::new("xdg-open")
+            .arg(url)
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .status();
+
+        if let Ok(cmd) = command {
+            if !cmd.success() {
+                eprintln!(
+                    "Couldn't open URL in web browser, xdg-open status: {}",
+                    cmd.code().unwrap_or(0)
+                )
+            }
+        } else {
+            eprintln!(
+                "Couldn't execute the xdg-open command: {}",
+                command.unwrap_err().to_string()
+            )
+        }
+    })
 }
