@@ -1,12 +1,13 @@
 use axum::{extract::State, response::Html};
+use tokio::sync::broadcast::{Receiver, Sender};
 
 use super::server::AppState;
 
 #[derive(Clone, PartialEq, Debug)]
-pub struct Message {
+pub struct ChanMessage {
     pub message: String,
     pub status: u16,
-    pub id: i32,
+    //pub id: i32,
 }
 
 // impl Message {
@@ -32,10 +33,10 @@ impl Messages {
     pub fn update(state: AppState, message: String, status: u16) {
         let messages_object = &mut state.messages_object.lock().unwrap();
 
-        let message = vec![Message {
+        let message = vec![ChanMessage {
             message: message.into(),
             status: status,
-            id: messages_object.message_id,
+            //id: messages_object.message_id,
         }];
 
         let current_messages = &mut state.messages.lock().unwrap();
@@ -82,7 +83,7 @@ impl Messages {
         Html(messages)
     }
 
-    pub fn messages(State(state): State<AppState>) -> Vec<Message> {
+    pub fn messages(State(state): State<AppState>) -> Vec<ChanMessage> {
         state.messages.lock().unwrap().to_vec()
     }
     // pub fn messages_async(State(state): State<AppState>) -> Vec<Message> {
@@ -90,12 +91,12 @@ impl Messages {
     // }
 }
 
-impl Default for Message {
+impl Default for ChanMessage {
     fn default() -> Self {
         Self {
             message: String::new(),
             status: 0,
-            id: 0,
+            //id: 0,
         }
     }
 }

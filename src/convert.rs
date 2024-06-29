@@ -9,7 +9,7 @@ use pulldown_cmark::Parser;
 use spinners::Spinner;
 
 use crate::{
-    http::{message::Messages, server::AppState},
+    http::{message::{ChanMessage, Messages}, server::AppState},
     tools::get_filename,
     SPINNER_TYPE,
 };
@@ -52,7 +52,7 @@ pub struct ConvertResponse {
     pub convert_output: Option<String>,
 }
 
-pub fn convert(
+pub async fn convert(
     args: &super::args::Convert,
     debug: bool,
     state: Option<AppState>,
@@ -73,7 +73,16 @@ pub fn convert(
             exit(1);
         }
 
-        Messages::send_transforming_async(axum::extract::State(state.unwrap()));
+        //Messages::send_transforming_async(axum::extract::State(state.unwrap()));
+        println!("transforming: sending update..");
+        let state = state.unwrap().tx;
+        state.lock().await.send(ChanMessage {
+            message: "transforming".to_string(),
+            status: 2
+        }).unwrap();
+        println!("transforming: sent update!");
+
+        drop(state);
     }
 
     let spinner_state = Arc::new(Mutex::new(SpinnerState { stop: false }));

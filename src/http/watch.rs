@@ -3,12 +3,16 @@ use std::path::Path;
 use axum::extract::State;
 use std::time::Duration;
 
-use crate::{args::Convert, convert::convert, http::message::Messages};
+use crate::{
+    args::Convert,
+    convert::convert,
+    http::message::{ChanMessage, Messages},
+};
 use sha2::Digest;
 
 use super::server::AppState;
 
-pub fn watch(args: &Convert, State(state): State<AppState>) -> anyhow::Result<()> {
+pub async fn watch(args: &Convert, State(state): State<AppState>) -> anyhow::Result<()> {
     println!("Watching for changes... Press Ctrl+C to exit.");
 
     if args.raw {
@@ -34,10 +38,20 @@ pub fn watch(args: &Convert, State(state): State<AppState>) -> anyhow::Result<()
         };
 
         if file_hash != init_hash {
-            convert(&args, false, Some(state.clone()));
+            convert(&args, false, Some(state.clone())).await;
+
+            let tx = state.tx.lock().await;
 
             // send messages
-            Messages::send_update(axum::extract::State(state.clone()));
+            //Messages::send_update(axum::extract::State(state.clone()));
+            println!("reload: sending update..");
+            tx.send(ChanMessage {
+                message: "reload".to_string(),
+                status: 1,
+            }).unwrap();
+            println!("reload: sent update!");
+
+            drop(tx);
 
             init_hash = file_hash;
         }

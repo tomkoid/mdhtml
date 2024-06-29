@@ -46,7 +46,7 @@ async fn main() {
                 }
             }
 
-            let resp = convert::convert(&args, true, None);
+            let resp = convert::convert(&args, true, None).await;
             if args.open {
                 if resp.convert_output.is_some() {
                     let handle = xdg_open_in_app(resp.convert_output.unwrap());

@@ -1,28 +1,35 @@
-use std::sync::{Arc, Mutex};
+use std::{cell::RefCell, sync::{Arc, Mutex}};
 
 use axum::{routing::get, Router};
+use tokio::sync::broadcast::{self, Receiver, Sender};
 
 use crate::args::Convert;
 
 use super::{
-    message::{Message, Messages},
+    message::{ChanMessage, Messages},
     watch::watch,
 };
 
 #[derive(Clone)]
 pub struct AppState {
     pub args: Convert,
-    pub messages: Arc<Mutex<Vec<Message>>>,
+    pub messages: Arc<Mutex<Vec<ChanMessage>>>,
     pub messages_object: Arc<Mutex<Messages>>,
+    pub tx: Arc<tokio::sync::Mutex<Sender<ChanMessage>>>,
+    pub rx: Arc<tokio::sync::Mutex<Receiver<ChanMessage>>>,
 }
 
 pub async fn start_server(args: &Convert) {
     let messages = Messages::new();
 
+    let (tx, rx): (Sender<ChanMessage>, Receiver<ChanMessage>) = broadcast::channel(1);
+
     let state = AppState {
         args: args.clone(),
         messages: Arc::new(Mutex::new(Vec::new())),
         messages_object: Arc::new(Mutex::new(messages.clone())),
+        tx: Arc::new(tokio::sync::Mutex::new(tx)),
+        rx: Arc::new(tokio::sync::Mutex::new(rx)),
     };
 
     // build our application with a single route
@@ -36,10 +43,14 @@ pub async fn start_server(args: &Convert) {
     let args_temp = args.clone();
 
     tokio::spawn(async move {
-        watch(&args_temp, axum::extract::State(state)).unwrap();
+        watch(&args_temp, axum::extract::State(state))
+            .await
+            .unwrap();
     });
 
     // run our app with hyper, listening globally on port 3000
-    let listener = tokio::net::TcpListener::bind(format!("{}:{}", args.hostname, args.port)).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(format!("{}:{}", args.hostname, args.port))
+        .await
+        .unwrap();
     axum::serve(listener, app).await.unwrap();
 }
