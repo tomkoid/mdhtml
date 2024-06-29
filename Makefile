@@ -1,5 +1,5 @@
 build:
-	go build -o mdhtml main.go
+	cargo build --release
 
 clean:
-	rm -rf mdhtml
+	cargo clean
