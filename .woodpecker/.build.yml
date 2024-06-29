@@ -1,6 +1,9 @@
 steps:
-  mdhtml:
+  check:
     image: rust 
     commands:
       - cargo check 
+  test:
+    image: rust
+    command:
       - cargo test
