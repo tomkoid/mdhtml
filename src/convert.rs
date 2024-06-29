@@ -4,6 +4,7 @@ use std::{
     sync::{Arc, Mutex},
 };
 
+use colored::Colorize;
 use pulldown_cmark::Parser;
 use spinners::Spinner;
 
@@ -16,6 +17,8 @@ use crate::{
 struct SpinnerState {
     pub stop: bool, // stop signal, stop the spinner if true
 }
+
+const SPACING: &str = "   ";
 
 fn spinner_handler(spinner_state: Arc<Mutex<SpinnerState>>) {
     // sleep before starting
@@ -171,18 +174,21 @@ pub fn convert(args: &super::args::Convert, debug: bool, state: Option<AppState>
     }
 
     if debug {
-        println!("=> Successfully wrote to output file {}.", true_output_file);
+        println!("{} Successfully wrote to output file {}.", "==".green().bold(), true_output_file);
 
         println!(
-            "=> View in browser at file://{}.",
+            "{SPACING}View in browser at {}{}.",
+            "file://".blue(),
             PathBuf::from(true_output_file)
                 .canonicalize()
                 .unwrap()
                 .display()
+                .to_string()
+                .blue()
         );
 
         if style_arg.is_some() {
-            println!("  => Used style file {}", style_arg.clone().unwrap());
+            println!("{SPACING}Used style file {}", style_arg.clone().unwrap().blue());
         }
     }
 }
