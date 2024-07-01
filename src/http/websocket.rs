@@ -1,3 +1,5 @@
+use std::{sync::Arc, time::Duration};
+
 use axum::{
     extract::{
         ws::{Message, WebSocket, WebSocketUpgrade},
@@ -5,30 +7,50 @@ use axum::{
     },
     response::IntoResponse,
 };
+use tokio::sync::broadcast::Receiver;
+use tokio_stream::{wrappers::BroadcastStream, StreamExt};
+
+use crate::http::message::ChanMessage;
 
 use super::server::AppState;
 
-pub async fn ws_handler(State(state): State<AppState>, ws: WebSocketUpgrade) -> impl IntoResponse {
+pub async fn ws_handler(State(state): State<Arc<AppState>>, ws: WebSocketUpgrade) -> impl IntoResponse {
     ws.on_upgrade(move |socket| handle_socket(state, socket))
 }
 
-async fn handle_socket(state: AppState, mut socket: WebSocket) {
+async fn handle_socket(state: Arc<AppState>, mut socket: WebSocket) {
     println!("ws: hello client!!");
     let state = axum::extract::State(state.clone());
-    //let mut messages = Messages::messages(state.clone());
 
     // echo back messages
     socket.send(Message::Text("hello".into())).await.unwrap();
 
-    let rx = state.rx.clone();
-    //let mut rx = state.tx.clone().lock().await.subscribe();
+    let mut rx: Receiver<ChanMessage> = state.tx.subscribe();
 
-    println!("waiting for msg..");
+    loop {
+        if rx.is_empty() {
+            std::thread::sleep(Duration::from_millis(20));
+            continue
+        }
+        println!("waiting for msg..");
+        let msg = rx.try_recv();
 
-    while let Ok(msg) = rx.lock().await.recv().await {
-    //while let Ok(msg) = rx.recv().await {
+        let msg = if let Ok(msg) = msg {
+            msg
+        } else {
+            eprintln!("receiver failed: {}", msg.unwrap_err());
+            continue;
+        };
+
         println!("msg arrived!");
         println!("chan msg: {}", msg.message);
+        let socket_send = socket.send(Message::Text(msg.message)).await;
+
+        if !socket_send.is_ok() {
+            eprintln!("error: {}", socket_send.unwrap_err().to_string());
+            socket.close().await.unwrap();
+            break;
+        }
 
         println!("waiting for msg..");
     }

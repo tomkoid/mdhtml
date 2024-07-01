@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::{path::Path, sync::Arc};
 
 use axum::extract::State;
 use std::time::Duration;
@@ -12,7 +12,7 @@ use sha2::Digest;
 
 use super::server::AppState;
 
-pub async fn watch(args: &Convert, State(state): State<AppState>) -> anyhow::Result<()> {
+pub async fn watch(args: &Convert, State(state): State<Arc<AppState>>) -> anyhow::Result<()> {
     println!("Watching for changes... Press Ctrl+C to exit.");
 
     if args.raw {
@@ -20,6 +20,7 @@ pub async fn watch(args: &Convert, State(state): State<AppState>) -> anyhow::Res
     }
 
     let mut init_hash = String::from("something very random");
+    let tx = state.tx.clone();
 
     // some error handling
     loop {
@@ -38,9 +39,13 @@ pub async fn watch(args: &Convert, State(state): State<AppState>) -> anyhow::Res
         };
 
         if file_hash != init_hash {
-            convert(&args, false, Some(state.clone())).await;
-
-            let tx = state.tx.lock().await;
+            println!("transform: sending transforming..");
+            tx.send(ChanMessage {
+                message: "transforming".to_string(),
+                status: 2,
+            }).unwrap();
+            println!("transform: sent transforming!");
+            convert(&args, false).await;
 
             // send messages
             //Messages::send_update(axum::extract::State(state.clone()));
@@ -51,10 +56,11 @@ pub async fn watch(args: &Convert, State(state): State<AppState>) -> anyhow::Res
             }).unwrap();
             println!("reload: sent update!");
 
-            drop(tx);
-
             init_hash = file_hash;
         }
+
+        // sleep for a while
+        std::thread::sleep(Duration::from_millis(20));
     }
 }
 

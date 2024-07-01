@@ -1,10 +1,12 @@
+use std::sync::Arc;
+
 use axum::{extract::State, response::Html};
 
 use crate::tools::get_filename;
 
 use super::server::AppState;
 
-pub async fn get_index(State(state): State<AppState>) -> Html<String> {
+pub async fn get_index(State(state): State<Arc<AppState>>) -> Html<String> {
     // get filename of output file
     let filename = get_filename(&state.args);
 

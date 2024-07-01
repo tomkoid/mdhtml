@@ -15,22 +15,24 @@ pub struct AppState {
     pub args: Convert,
     pub messages: Arc<Mutex<Vec<ChanMessage>>>,
     pub messages_object: Arc<Mutex<Messages>>,
-    pub tx: Arc<tokio::sync::Mutex<Sender<ChanMessage>>>,
-    pub rx: Arc<tokio::sync::Mutex<Receiver<ChanMessage>>>,
+    pub tx: Sender<ChanMessage>,
+    //pub rx: Receiver<ChanMessage>,
 }
 
 pub async fn start_server(args: &Convert) {
     let messages = Messages::new();
 
-    let (tx, rx): (Sender<ChanMessage>, Receiver<ChanMessage>) = broadcast::channel(1);
+    let (tx, rx): (Sender<ChanMessage>, Receiver<ChanMessage>) = broadcast::channel(16);
 
-    let state = AppState {
+    let app_state = AppState {
         args: args.clone(),
-        messages: Arc::new(Mutex::new(Vec::new())),
-        messages_object: Arc::new(Mutex::new(messages.clone())),
-        tx: Arc::new(tokio::sync::Mutex::new(tx)),
-        rx: Arc::new(tokio::sync::Mutex::new(rx)),
+        messages: Mutex::new(Vec::new()).into(),
+        messages_object: Mutex::new(messages.clone()).into(),
+        tx,
+        //rx
     };
+
+    let state = Arc::new(app_state);
 
     // build our application with a single route
     let app = Router::new()

@@ -7,9 +7,10 @@ use std::{
 use colored::Colorize;
 use pulldown_cmark::Parser;
 use spinners::Spinner;
+use tokio::sync::broadcast::{Receiver, Sender};
 
 use crate::{
-    http::{message::{ChanMessage, Messages}, server::AppState},
+    http::{message::ChanMessage, server::AppState},
     tools::get_filename,
     SPINNER_TYPE,
 };
@@ -55,7 +56,8 @@ pub struct ConvertResponse {
 pub async fn convert(
     args: &super::args::Convert,
     debug: bool,
-    state: Option<AppState>,
+    //state: Option<Arc<AppState>>,
+    //tx: Option<&Sender<ChanMessage>>
 ) -> ConvertResponse {
     // config
     let raw_arg = args.raw;
@@ -66,23 +68,22 @@ pub async fn convert(
     let true_output_file = get_filename(&args);
 
     if server_arg {
-        if state.is_none() {
-            eprintln!("Error: Could not send transforming message through websocket.");
-            eprintln!("Could not get state for server.");
-
-            exit(1);
-        }
+        //if state.is_none() {
+        //    eprintln!("Error: Could not send transforming message through websocket.");
+        //    eprintln!("Could not get state for server.");
+        //
+        //    exit(1);
+        //}
 
         //Messages::send_transforming_async(axum::extract::State(state.unwrap()));
-        println!("transforming: sending update..");
-        let state = state.unwrap().tx;
-        state.lock().await.send(ChanMessage {
-            message: "transforming".to_string(),
-            status: 2
-        }).unwrap();
-        println!("transforming: sent update!");
+        //println!("transforming: sending update..");
 
-        drop(state);
+        //tx.expect("server arg supplied but no tx given").send(ChanMessage {
+        //    message: "transforming".to_string(),
+        //    status: 2
+        //}).unwrap();
+
+        //println!("transforming: sent update!");
     }
 
     let spinner_state = Arc::new(Mutex::new(SpinnerState { stop: false }));

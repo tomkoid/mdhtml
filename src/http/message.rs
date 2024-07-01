@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use axum::{extract::State, response::Html};
 use tokio::sync::broadcast::{Receiver, Sender};
 
@@ -30,7 +32,7 @@ impl Messages {
         Self { message_id: 1 }
     }
 
-    pub fn update(state: AppState, message: String, status: u16) {
+    pub fn update(state: Arc<AppState>, message: String, status: u16) {
         let messages_object = &mut state.messages_object.lock().unwrap();
 
         let message = vec![ChanMessage {
@@ -48,23 +50,23 @@ impl Messages {
         messages_object.message_id += 1;
     }
 
-    // pub fn send_hello(State(state): State<AppState>) {
+    // pub fn send_hello(State(state): State<Arc<AppState>>) {
     //     Self::update(state, "hello".into(), 0);
     // }
     //
-    pub fn send_update(State(state): State<AppState>) {
+    pub fn send_update(State(state): State<Arc<AppState>>) {
         Self::update(state, "reload".into(), 1);
     }
 
-    pub fn send_transforming_async(State(state): State<AppState>) {
+    pub fn send_transforming_async(State(state): State<Arc<AppState>>) {
         Self::update(state, "transforming".into(), 2);
     }
 
-    pub async fn send_update_async(State(state): State<AppState>) {
+    pub async fn send_update_async(State(state): State<Arc<AppState>>) {
         Self::update(state, "reload".into(), 1);
     }
 
-    pub async fn messages_html(State(state): State<AppState>) -> Html<String> {
+    pub async fn messages_html(State(state): State<Arc<AppState>>) -> Html<String> {
         let mut messages = String::new();
 
         for message in state.messages.lock().unwrap().iter() {
@@ -83,10 +85,10 @@ impl Messages {
         Html(messages)
     }
 
-    pub fn messages(State(state): State<AppState>) -> Vec<ChanMessage> {
+    pub fn messages(State(state): State<Arc<AppState>>) -> Vec<ChanMessage> {
         state.messages.lock().unwrap().to_vec()
     }
-    // pub fn messages_async(State(state): State<AppState>) -> Vec<Message> {
+    // pub fn messages_async(State(state): State<Arc<AppState>>) -> Vec<Message> {
     //     state.messages.lock().unwrap().to_vec()
     // }
 }

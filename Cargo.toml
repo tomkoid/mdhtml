@@ -15,4 +15,5 @@ pulldown-cmark = "0.9.3"
 sha2 = "0.10.8"
 spinners = "4.1.1"
 tokio = { version = "1.35.1", features = ["macros", "rt-multi-thread"] }
+tokio-stream = { version = "0.1.15", features = ["sync"] }
 tokio-tungstenite = "0.21.0"
