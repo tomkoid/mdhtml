@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/gomarkdown/markdown/ast"
 )
@@ -56,7 +58,7 @@ const (
 )
 
 // for each character that triggers a response when parsing inline data.
-type inlineParser func(p *Parser, data []byte, offset int) (int, ast.Node)
+type InlineParser func(p *Parser, data []byte, offset int) (int, ast.Node)
 
 // ReferenceOverrideFunc is expected to be called with a reference string and
 // return either a valid Reference type that the reference string maps to or
@@ -98,7 +100,7 @@ type Parser struct {
 
 	refs           map[string]*reference
 	refsRecord     map[string]struct{}
-	inlineCallback [256]inlineParser
+	inlineCallback [256]InlineParser
 	nesting        int
 	maxNesting     int
 	insideLink     bool
@@ -181,7 +183,7 @@ func NewWithExtensions(extension Extensions) *Parser {
 	return &p
 }
 
-func (p *Parser) RegisterInline(n byte, fn inlineParser) inlineParser {
+func (p *Parser) RegisterInline(n byte, fn InlineParser) InlineParser {
 	prev := p.inlineCallback[n]
 	p.inlineCallback[n] = fn
 	return prev
@@ -727,6 +729,20 @@ func IsPunctuation(c byte) bool {
 	return false
 }
 
+func IsPunctuation2(d []byte) bool {
+	if len(d) == 0 {
+		return false
+	}
+	if IsPunctuation(d[0]) {
+		return true
+	}
+	r, _ := utf8.DecodeRune(d)
+	if r == utf8.RuneError {
+		return false
+	}
+	return unicode.IsPunct(r)
+}
+
 // IsSpace returns true if c is a white-space charactr
 func IsSpace(c byte) bool {
 	return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == '\v'
@@ -907,6 +923,9 @@ func isListItem(d ast.Node) bool {
 }
 
 func NormalizeNewlines(d []byte) []byte {
+	res := make([]byte, len(d))
+	copy(res, d)
+	d = res
 	wi := 0
 	n := len(d)
 	for i := 0; i < n; i++ {
